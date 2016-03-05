@@ -1,35 +1,37 @@
 package com.camaleon.entities;
 
+import java.util.HashSet;
+
 public class FuncDependency {
 
-	private AttributeGrp implicant;
-	private AttributeGrp implied;
+	private HashSet<String> implicant;
+	private HashSet<String> implied;
 
 	public FuncDependency() {
 		super();
-		this.implicant = new AttributeGrp();
-		this.implied = new AttributeGrp();
+		this.implicant = new HashSet<String>();
+		this.implied = new HashSet<String>();
 	}
 
-	public FuncDependency(AttributeGrp implicant, AttributeGrp implied) {
+	public FuncDependency(HashSet<String> implicant, HashSet<String> implied) {
 		super();
 		this.implicant = implicant;
 		this.implied = implied;
 	}
 
-	public AttributeGrp getImplicant() {
+	public HashSet<String> getImplicant() {
 		return implicant;
 	}
 
-	public void setImplicant(AttributeGrp implicant) {
+	public void setImplicant(HashSet<String> implicant) {
 		this.implicant = implicant;
 	}
 
-	public AttributeGrp getImplied() {
+	public HashSet<String> getImplied() {
 		return implied;
 	}
 
-	public void setImplied(AttributeGrp implied) {
+	public void setImplied(HashSet<String> implied) {
 		this.implied = implied;
 	}
 

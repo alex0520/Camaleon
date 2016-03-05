@@ -5,6 +5,7 @@ package com.camaleon.entities;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -14,25 +15,26 @@ import java.util.List;
  */
 public class AttributeGrp {
 
-	private List<String> attributes;
+	private HashSet<String> attributes;
 
 	public AttributeGrp() {
 		super();
-		this.attributes = new ArrayList<String>();
+		this.attributes = new HashSet<String>();
 	}
 
-	public AttributeGrp(List<String> attributes) {
+	public AttributeGrp(HashSet<String> attributes) {
 		super();
-		Collections.sort(attributes);
-		this.attributes = attributes;
+		this.setAttributes(attributes);
 	}
 
-	public List<String> getAttributes() {
+	public HashSet<String> getAttributes() {
 		return attributes;
 	}
 
-	public void setAttributes(List<String> attributes) {
-		this.attributes = attributes;
+	public void setAttributes(HashSet<String> attributes) {
+		List<String> sortedList = new ArrayList<String>(attributes);
+		Collections.sort(sortedList);
+		this.attributes = new HashSet<String>(sortedList);
 	}
 
 	@Override
@@ -58,10 +60,11 @@ public class AttributeGrp {
 
 	@Override
 	public String toString() {
+		String separator = "";
 		StringBuilder sb = new StringBuilder();
 		for (String s : this.attributes) {
-			sb.append(s);
-			sb.append(",");
+			sb.append(separator).append(s);
+			separator = ",";
 		}
 		return "AttributeGrp [attributes=" + sb.toString() + "]";
 	}
