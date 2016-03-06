@@ -20,34 +20,60 @@ public class CandidateKeys {
 	public static List<HashSet<String>> candidateKeys(Relation relation,
 			HashMap<HashSet<String>, HashSet<String>> closures) {
 		List<HashSet<String>> candidateKeys = new ArrayList<HashSet<String>>();
-		Function<FuncDependency, HashSet<String>> function = new Function<FuncDependency, HashSet<String>>() {
+		Function<FuncDependency, HashSet<String>> impliedFunction = new Function<FuncDependency, HashSet<String>>() {
 			@Override
 			public HashSet<String> apply(FuncDependency input) {
 				return input.getImplied();
 			}
 		};
 
+		Function<FuncDependency, HashSet<String>> implicantFunction = new Function<FuncDependency, HashSet<String>>() {
+			@Override
+			public HashSet<String> apply(FuncDependency input) {
+				return input.getImplicant();
+			}
+		};
+
+		Set<HashSet<String>> implicant = new HashSet<HashSet<String>>(
+				Collections2.transform(relation.getDependencies(),
+						implicantFunction));
+
 		Set<HashSet<String>> implied = new HashSet<HashSet<String>>(
-				Collections2.transform(relation.getDependencies(), function));
+				Collections2.transform(relation.getDependencies(),
+						impliedFunction));
 
 		int attrSize = relation.getAttributes().size();
 		HashSet<String> yesHashSet = new HashSet<String>();
 		HashSet<String> noHashSet = new HashSet<String>();
 		HashSet<String> maybeHashSet = new HashSet<String>();
+		HashSet<String> impliedHashSet = new HashSet<String>();
+		HashSet<String> implicantHashSet = new HashSet<String>();
 
 		for (HashSet<String> hashSet : implied) {
-			noHashSet.addAll(hashSet);
+			impliedHashSet.addAll(hashSet);
 		}
 
-		SetView<String> yesSet = Sets.difference(relation.getAttributes(), noHashSet);
+		for (HashSet<String> hashSet : implicant) {
+			implicantHashSet.addAll(hashSet);
+		}
+
+		SetView<String> yesSet = Sets.difference(relation.getAttributes(),
+				impliedHashSet);
+		SetView<String> noSet = Sets.difference(relation.getAttributes(),
+				implicantHashSet);
+		noHashSet = new HashSet<String>(noSet);
 
 		if (yesSet.size() > 0) {
 			yesHashSet = new HashSet<String>(yesSet);
-			HashSet<String> closureYesSet = Util.closure(yesHashSet, relation.getDependencies(), closures);
+			HashSet<String> closureYesSet = Util.closure(yesHashSet,
+					relation.getDependencies(), closures);
 			if (closureYesSet.size() == relation.getAttributes().size()) {
 				candidateKeys.add(yesHashSet);
 				return candidateKeys;
 			}
+			SetView<String> maybeSet = Sets.difference(
+					relation.getAttributes(), yesHashSet);
+			maybeHashSet = new HashSet<String>(maybeSet);
 		} else {
 			maybeHashSet = new HashSet<String>(relation.getAttributes());
 		}
@@ -70,9 +96,14 @@ public class CandidateKeys {
 
 		for (int i = 1; i < powerList.size(); i++) {
 			final HashSet<String> trySet = new HashSet<String>(powerList.get(i));
-			HashSet<String> closure = Util.closure(trySet, relation.getDependencies(), closures);
+			HashSet<String> tempTrySet = new HashSet<String>(trySet);
+			if (yesHashSet.size() > 0) {
+				tempTrySet.addAll(yesHashSet);
+			}
+			HashSet<String> closure = Util.closure(tempTrySet,
+					relation.getDependencies(), closures);
 			if (closure.size() == attrSize) {
-				candidateKeys.add(trySet);
+				candidateKeys.add(tempTrySet);
 				Predicate<Set<String>> subCombinationsPredicate = new Predicate<Set<String>>() {
 					@Override
 					public boolean apply(Set<String> input) {
@@ -81,12 +112,14 @@ public class CandidateKeys {
 				};
 
 				ArrayList<Set<String>> subCombinations = new ArrayList<Set<String>>(
-						Collections2.filter(powerList, subCombinationsPredicate));
+						Collections2
+								.filter(powerList, subCombinationsPredicate));
 				powerList.removeAll(subCombinations);
 				i--;
 			}
 
 		}
+
 		return candidateKeys;
 	}
 }
