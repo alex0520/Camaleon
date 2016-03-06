@@ -18,6 +18,10 @@ public class Util {
 	public static HashSet<String> closure(HashSet<String> attributes, List<FuncDependency> dependencies,
 			HashMap<HashSet<String>, HashSet<String>> closures) {
 
+		if (closures == null) {
+			closures = new HashMap<HashSet<String>, HashSet<String>>();
+		}
+
 		if (!closures.containsKey(attributes)) {
 			HashSet<String> closure = new HashSet<String>();
 			HashSet<String> closureNew = new HashSet<String>();
@@ -44,14 +48,12 @@ public class Util {
 						@Override
 						public boolean apply(FuncDependency dependency) {
 							HashSet<String> implicant = dependency.getImplicant();
-							boolean contains = false;
 							for (HashSet<String> hashSet : intersection) {
-								contains = (contains || hashSet.containsAll(implicant));
-								if (contains) {
-									break;
+								if (hashSet.containsAll(implicant)) {
+									return true;
 								}
 							}
-							return contains;
+							return false;
 						}
 					};
 

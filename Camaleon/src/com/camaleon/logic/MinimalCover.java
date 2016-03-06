@@ -42,7 +42,6 @@ public class MinimalCover {
 
 	public static List<FuncDependency> removeStrangeElemLeft(List<FuncDependency> dependencies,
 			HashMap<HashSet<String>, HashSet<String>> closures) {
-		List<FuncDependency> originalDependencies = new ArrayList<FuncDependency>(dependencies);
 		int i = 0;
 		int j = 0;
 		do {
@@ -79,6 +78,25 @@ public class MinimalCover {
 			}
 		} while (i < dependencies.size());
 
+		return dependencies;
+	}
+
+	public static List<FuncDependency> removeRedundantDependencies(List<FuncDependency> dependencies) {
+		List<FuncDependency> tempDependencies;
+		int i = 0;
+		do {
+			tempDependencies = new ArrayList<FuncDependency>(dependencies);
+			FuncDependency funcDependency = tempDependencies.get(i);
+			HashSet<String> implicant = funcDependency.getImplicant();
+			HashSet<String> implied = funcDependency.getImplied();
+			tempDependencies.remove(i);
+			HashSet<String> closure = Util.closure(implicant, tempDependencies, null);
+			if (closure.containsAll(implied)) {
+				dependencies.remove(i);
+			} else {
+				i++;
+			}
+		} while (i < dependencies.size());
 		return dependencies;
 	}
 }
