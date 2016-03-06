@@ -34,10 +34,16 @@ public class FuncDependency {
 	public void setImplied(HashSet<String> implied) {
 		this.implied = implied;
 	}
+	
+//	@Override
+//	public String toString() {
+//		return "FuncDependency [implicant=" + implicant + ", implied="
+//				+ implied + "]";
+//	}
 
 	@Override
 	public String toString() {
-		return "FuncDependency [implicant=" + implicant + ", implied="
+		return "[" + implicant + " -> "
 				+ implied + "]";
 	}
 

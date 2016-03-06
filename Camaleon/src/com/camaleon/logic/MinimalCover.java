@@ -1,6 +1,7 @@
 package com.camaleon.logic;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -10,8 +11,7 @@ import com.google.common.collect.Collections2;
 
 public class MinimalCover {
 
-	public static List<FuncDependency> rightDecomposition(
-			List<FuncDependency> dependencies) {
+	public static List<FuncDependency> rightDecomposition(List<FuncDependency> dependencies) {
 
 		Predicate<FuncDependency> impliedComp = new Predicate<FuncDependency>() {
 			@Override
@@ -36,6 +36,48 @@ public class MinimalCover {
 			}
 			dependencies.remove(dependency);
 		}
+
+		return dependencies;
+	}
+
+	public static List<FuncDependency> removeStrangeElemLeft(List<FuncDependency> dependencies,
+			HashMap<HashSet<String>, HashSet<String>> closures) {
+		List<FuncDependency> originalDependencies = new ArrayList<FuncDependency>(dependencies);
+		int i = 0;
+		int j = 0;
+		do {
+			FuncDependency funcDependency = dependencies.get(i);
+			boolean strange = false;
+			if (funcDependency.getImplicant().size() > 1) {
+				HashSet<String> implicant = funcDependency.getImplicant();
+				HashSet<String> implied = funcDependency.getImplied();
+				List<String> tempImplicant = new ArrayList<String>(implicant);
+
+				do {
+					tempImplicant = new ArrayList<String>(implicant);
+					if (j < tempImplicant.size()) {
+						tempImplicant.remove(j);
+						HashSet<String> closure = Util.closure(new HashSet<String>(tempImplicant), dependencies,
+								closures);
+						if (closure.containsAll(implied)) {
+							strange = true;
+							FuncDependency tempFuncDep = new FuncDependency();
+							tempFuncDep.setImplicant(new HashSet<String>(tempImplicant));
+							tempFuncDep.setImplied(implied);
+							dependencies.remove(i);
+							dependencies.add(i, tempFuncDep);
+							break;
+						}
+						j++;
+					}
+				} while (j < implicant.size());
+
+			}
+			if (!strange) {
+				i++;
+				j = 0;
+			}
+		} while (i < dependencies.size());
 
 		return dependencies;
 	}
