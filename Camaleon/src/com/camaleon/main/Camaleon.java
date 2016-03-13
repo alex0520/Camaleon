@@ -6,8 +6,8 @@ import java.util.List;
 
 import com.camaleon.entities.Relation;
 import com.camaleon.logic.CandidateKeys;
+import com.camaleon.logic.LoadFile;
 import com.camaleon.logic.MinimalCover;
-import com.camaleon.logic.ReadCVS;
 
 public class Camaleon {
 
@@ -16,8 +16,8 @@ public class Camaleon {
 	 */
 	public static void main(String[] args) {
 
-		Relation relacion = ReadCVS.loadFile(
-				"C:/Users/USUARIO/File/LoadFile/archive.cvs", ",", " ");
+		Relation relacion = LoadFile
+				.loadFile("C:/Users/USUARIO/Desktop/JSON3.JSON");
 
 		HashMap<HashSet<String>, HashSet<String>> closures = new HashMap<HashSet<String>, HashSet<String>>();
 
