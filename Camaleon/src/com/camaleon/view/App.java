@@ -6,11 +6,13 @@
 package com.camaleon.view;
 
 import com.camaleon.entities.FuncDependency;
+import com.camaleon.entities.LoadFileResult;
 import com.camaleon.entities.Relation;
 import com.camaleon.entities.TreeSetListModel;
 import com.camaleon.logic.CandidateKeys;
 import com.camaleon.logic.LoadFile;
 import com.camaleon.logic.MinimalCover;
+import com.google.common.base.Joiner;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -401,19 +403,32 @@ public class App extends javax.swing.JFrame {
         int returnVal = jFileChooser.showOpenDialog(JOptionPane
                 .getFrameForComponent((Component) evt.getSource()));
         if (returnVal == JFileChooser.APPROVE_OPTION) {
+            cleanAll();
             String path = jFileChooser.getSelectedFile().getAbsolutePath();
-            if (path.substring(path.lastIndexOf(".") + 1, path.length()).equalsIgnoreCase("json")) {
-                relation = LoadFile.loadFile(path);
+            LoadFileResult loadFileResult = LoadFile.loadFile(path);
+            if (loadFileResult.getStatus().equals(LoadFileResult.Status.SUCCESS)) {
+                relation = loadFileResult.getRelation();
                 for (Iterator<String> iterator = relation.getAttributes().iterator(); iterator.hasNext();) {
                     tslmAtributos.add(iterator.next());
                 }
                 for (Iterator<FuncDependency> iterator = relation.getDependencies().iterator(); iterator.hasNext();) {
                     tslmDepFuncionales.add(iterator.next());
                 }
-                JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "El archivo seleccionado fue cargado correctamente", "Correcto", JOptionPane.INFORMATION_MESSAGE);
+
+                StringBuilder sb = new StringBuilder("El archivo seleccionado fue cargado correctamente");
+
+                if (loadFileResult.getMessages().size() > 0) {
+                    sb.append(", con las siguientes anotaciones:\n\n");
+                    sb.append(Joiner.on("\n").join(loadFileResult.getMessages()));
+                } else {
+                    sb.append(".");
+                }
+
+                JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), sb.toString(), "Correcto", JOptionPane.INFORMATION_MESSAGE);
                 jtpVista.setEnabledAt(1, true);
             } else {
-                JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Ud no selecciono un archivo válido", "Error", JOptionPane.ERROR_MESSAGE);
+                String errors = new StringBuilder("Ocurrieron los siguientes errores al cargar el archivo: ").append("\n\n").append(Joiner.on("\n").join(loadFileResult.getMessages())).toString();
+                JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), errors, "Error", JOptionPane.ERROR_MESSAGE);
             }
 
         }
@@ -578,6 +593,18 @@ public class App extends javax.swing.JFrame {
         this.relation.getDependencies().add(funcDependencyNew);
         rePaintDepFunc(tslmDepFuncionales);
         JOptionPane.showMessageDialog(this, "Se modificó la dependencia funcional correctamente", "Correcto", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public void cleanAll() {
+        tslmAtributos.clear();
+        tslmDepFuncionales.clear();
+        tslmRightDecomp.clear();
+        tslmRemStrangeElemLeft.clear();
+        tslmRemFuncDepRedundant.clear();
+        dlmCandidateKeys.clear();
+        jtpVista.setSelectedIndex(0);
+        jtpVista.setEnabledAt(1, false);
+        jtpResultados.setSelectedIndex(0);
     }
 
     /**
