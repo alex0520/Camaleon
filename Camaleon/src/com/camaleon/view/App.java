@@ -8,11 +8,17 @@ package com.camaleon.view;
 import com.camaleon.entities.FuncDependency;
 import com.camaleon.entities.Relation;
 import com.camaleon.entities.TreeSetListModel;
+import com.camaleon.logic.CandidateKeys;
 import com.camaleon.logic.LoadFile;
+import com.camaleon.logic.MinimalCover;
 import java.awt.Component;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -24,8 +30,13 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public class App extends javax.swing.JFrame {
 
     Relation relation = new Relation();
+    HashMap<HashSet<String>, HashSet<String>> closures = new HashMap<HashSet<String>, HashSet<String>>();
     TreeSetListModel<String> tslmAtributos = new TreeSetListModel<String>(String.CASE_INSENSITIVE_ORDER);
     TreeSetListModel<FuncDependency> tslmDepFuncionales = new TreeSetListModel<FuncDependency>();
+    TreeSetListModel<FuncDependency> tslmRightDecomp = new TreeSetListModel<FuncDependency>();
+    TreeSetListModel<FuncDependency> tslmRemStrangeElemLeft = new TreeSetListModel<FuncDependency>();
+    TreeSetListModel<FuncDependency> tslmRemFuncDepRedundant = new TreeSetListModel<FuncDependency>();
+    DefaultListModel<HashSet<String>> dlmCandidateKeys = new DefaultListModel<>();
 
     /**
      * Creates new form App
@@ -34,6 +45,10 @@ public class App extends javax.swing.JFrame {
         initComponents();
         jlAtributos.setModel(tslmAtributos);
         jlDepFuncionales.setModel(tslmDepFuncionales);
+        jlRightDecomp.setModel(tslmRightDecomp);
+        jlRemStrangeElemLeft.setModel(tslmRemStrangeElemLeft);
+        jlRemFuncDepRedundant.setModel(tslmRemFuncDepRedundant);
+        jlCandidateKeys.setModel(dlmCandidateKeys);
         jtpVista.setEnabledAt(1, false);
     }
 
@@ -59,8 +74,24 @@ public class App extends javax.swing.JFrame {
         btnAddDepFunc = new javax.swing.JButton();
         btnEditDepFunc = new javax.swing.JButton();
         btnDelDepFunc = new javax.swing.JButton();
-        jpResultados = new javax.swing.JPanel();
         btnCargar = new javax.swing.JButton();
+        jtpResultados = new javax.swing.JTabbedPane();
+        jpRightDecomp = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jlRightDecomp = new javax.swing.JList<>();
+        btnRightDecomposition = new javax.swing.JButton();
+        jpRemStrangeElemLeft = new javax.swing.JPanel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        jlRemStrangeElemLeft = new javax.swing.JList<>();
+        btnRemStrangeElemLeft = new javax.swing.JButton();
+        jpRemFuncDepRedundant = new javax.swing.JPanel();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        jlRemFuncDepRedundant = new javax.swing.JList<>();
+        btnRemFuncDepRedundant = new javax.swing.JButton();
+        jpCandidateKeys = new javax.swing.JPanel();
+        jScrollPane6 = new javax.swing.JScrollPane();
+        jlCandidateKeys = new javax.swing.JList<>();
+        btnCandidateKeys = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Camaleon");
@@ -193,17 +224,6 @@ public class App extends javax.swing.JFrame {
 
         jtpVista.addTab("Dependencias Funcionales", jpDepFuncionales);
 
-        javax.swing.GroupLayout jpResultadosLayout = new javax.swing.GroupLayout(jpResultados);
-        jpResultados.setLayout(jpResultadosLayout);
-        jpResultadosLayout.setHorizontalGroup(
-            jpResultadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-        jpResultadosLayout.setVerticalGroup(
-            jpResultadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 223, Short.MAX_VALUE)
-        );
-
         btnCargar.setText("Cargar Archivo");
         btnCargar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -211,16 +231,152 @@ public class App extends javax.swing.JFrame {
             }
         });
 
+        jScrollPane3.setViewportView(jlRightDecomp);
+
+        btnRightDecomposition.setText("Calcular");
+        btnRightDecomposition.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRightDecompositionActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jpRightDecompLayout = new javax.swing.GroupLayout(jpRightDecomp);
+        jpRightDecomp.setLayout(jpRightDecompLayout);
+        jpRightDecompLayout.setHorizontalGroup(
+            jpRightDecompLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jpRightDecompLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jpRightDecompLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 754, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpRightDecompLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(btnRightDecomposition)))
+                .addContainerGap())
+        );
+        jpRightDecompLayout.setVerticalGroup(
+            jpRightDecompLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jpRightDecompLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnRightDecomposition)
+                .addContainerGap(15, Short.MAX_VALUE))
+        );
+
+        jtpResultados.addTab("Desc. Derecha", jpRightDecomp);
+
+        jScrollPane4.setViewportView(jlRemStrangeElemLeft);
+
+        btnRemStrangeElemLeft.setText("Calcular");
+        btnRemStrangeElemLeft.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRemStrangeElemLeftActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jpRemStrangeElemLeftLayout = new javax.swing.GroupLayout(jpRemStrangeElemLeft);
+        jpRemStrangeElemLeft.setLayout(jpRemStrangeElemLeftLayout);
+        jpRemStrangeElemLeftLayout.setHorizontalGroup(
+            jpRemStrangeElemLeftLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jpRemStrangeElemLeftLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jpRemStrangeElemLeftLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 754, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpRemStrangeElemLeftLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(btnRemStrangeElemLeft)))
+                .addContainerGap())
+        );
+        jpRemStrangeElemLeftLayout.setVerticalGroup(
+            jpRemStrangeElemLeftLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jpRemStrangeElemLeftLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnRemStrangeElemLeft)
+                .addContainerGap(15, Short.MAX_VALUE))
+        );
+
+        jtpResultados.addTab("Rem. Elem. Extraños Izq.", jpRemStrangeElemLeft);
+
+        jScrollPane5.setViewportView(jlRemFuncDepRedundant);
+
+        btnRemFuncDepRedundant.setText("Calcular");
+        btnRemFuncDepRedundant.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRemFuncDepRedundantActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jpRemFuncDepRedundantLayout = new javax.swing.GroupLayout(jpRemFuncDepRedundant);
+        jpRemFuncDepRedundant.setLayout(jpRemFuncDepRedundantLayout);
+        jpRemFuncDepRedundantLayout.setHorizontalGroup(
+            jpRemFuncDepRedundantLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jpRemFuncDepRedundantLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jpRemFuncDepRedundantLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 754, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpRemFuncDepRedundantLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(btnRemFuncDepRedundant)))
+                .addContainerGap())
+        );
+        jpRemFuncDepRedundantLayout.setVerticalGroup(
+            jpRemFuncDepRedundantLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jpRemFuncDepRedundantLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnRemFuncDepRedundant)
+                .addContainerGap(15, Short.MAX_VALUE))
+        );
+
+        jtpResultados.addTab("Rem.Dep. Func. Redundantes", jpRemFuncDepRedundant);
+
+        jScrollPane6.setViewportView(jlCandidateKeys);
+
+        btnCandidateKeys.setText("Calcular");
+        btnCandidateKeys.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCandidateKeysActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jpCandidateKeysLayout = new javax.swing.GroupLayout(jpCandidateKeys);
+        jpCandidateKeys.setLayout(jpCandidateKeysLayout);
+        jpCandidateKeysLayout.setHorizontalGroup(
+            jpCandidateKeysLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jpCandidateKeysLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jpCandidateKeysLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 754, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpCandidateKeysLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(btnCandidateKeys)))
+                .addContainerGap())
+        );
+        jpCandidateKeysLayout.setVerticalGroup(
+            jpCandidateKeysLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jpCandidateKeysLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnCandidateKeys)
+                .addContainerGap(15, Short.MAX_VALUE))
+        );
+
+        jtpResultados.addTab("Llaves Candidatas", jpCandidateKeys);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jtpVista)
-            .addComponent(jpResultados, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addGap(337, 337, 337)
                 .addComponent(btnCargar)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jtpResultados)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -230,7 +386,7 @@ public class App extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jtpVista, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jpResultados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jtpResultados, javax.swing.GroupLayout.PREFERRED_SIZE, 223, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
@@ -274,7 +430,7 @@ public class App extends javax.swing.JFrame {
         if (attr != null) {
             relation.getAttributes().add(attr);
             tslmAtributos.add(attr);
-            if(tslmAtributos.getSize()>1){
+            if (tslmAtributos.getSize() > 1) {
                 jtpVista.setEnabledAt(1, true);
             }
         }
@@ -303,7 +459,7 @@ public class App extends javax.swing.JFrame {
                 relation.editAttr(attr, newAttr);
                 tslmAtributos.remove(attr);
                 tslmAtributos.add(newAttr);
-                rePaintDepFunc();
+                rePaintDepFunc(tslmDepFuncionales);
             }
         }
     }//GEN-LAST:event_btnEditAtrActionPerformed
@@ -315,7 +471,7 @@ public class App extends javax.swing.JFrame {
                 String attr = jlAtributos.getSelectedValue();
                 relation.delAttr(attr);
                 tslmAtributos.remove(attr);
-                rePaintDepFunc();
+                rePaintDepFunc(tslmDepFuncionales);
             }
         }
     }//GEN-LAST:event_btnDelAtrActionPerformed
@@ -351,28 +507,76 @@ public class App extends javax.swing.JFrame {
                 FuncDependency funcDep = jlDepFuncionales.getSelectedValue();
                 relation.getDependencies().remove(funcDep);
                 tslmDepFuncionales.remove(funcDep);
-                rePaintDepFunc();
+                rePaintDepFunc(tslmDepFuncionales);
             }
         }
     }//GEN-LAST:event_btnDelDepFuncActionPerformed
 
-    private void rePaintDepFunc() {
-        tslmDepFuncionales.clear();
+    private void btnRightDecompositionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRightDecompositionActionPerformed
+        if (relation.getDependencies().size() > 0) {
+            relation.setDependencies(MinimalCover.rightDecomposition(relation
+                    .getDependencies()));
+            rePaintDepFunc(tslmRightDecomp);
+            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Se realizó descomposición a la derecha correctamente", "Correcto", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Ud debe crear al menos una dependencia funcional para utilizar esta opción", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnRightDecompositionActionPerformed
+
+    private void btnRemStrangeElemLeftActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemStrangeElemLeftActionPerformed
+        if (relation.getDependencies().size() > 0) {
+            relation.setDependencies(MinimalCover.removeStrangeElemLeft(
+                    relation.getDependencies(), closures));
+            rePaintDepFunc(tslmRemStrangeElemLeft);
+            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Se eliminaron elementos extraños a izquierda correctamente", "Correcto", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Ud debe crear al menos una dependencia funcional para utilizar esta opción", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnRemStrangeElemLeftActionPerformed
+
+    private void btnRemFuncDepRedundantActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemFuncDepRedundantActionPerformed
+        if (relation.getDependencies().size() > 1) {
+            relation.setDependencies(MinimalCover.removeRedundantDependencies(
+                    relation.getDependencies()));
+            rePaintDepFunc(tslmRemFuncDepRedundant);
+            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Se eliminaron dependencias funcionales redundantes correctamente", "Correcto", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Ud debe crear al menos dos dependencia funcional para utilizar esta opción", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnRemFuncDepRedundantActionPerformed
+
+    private void btnCandidateKeysActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCandidateKeysActionPerformed
+        if (relation.getDependencies().size() > 0) {
+            List<HashSet<String>> keys = CandidateKeys.candidateKeys(relation,
+                    closures);
+            dlmCandidateKeys.clear();
+            for (int i = 0; i < keys.size(); i++) {
+                dlmCandidateKeys.addElement(keys.get(i));
+            }
+            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Se calcularon las llaves candidatas de la relación correctamente", "Correcto", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Ud debe crear al menos una dependencia funcional para utilizar esta opción", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+    }//GEN-LAST:event_btnCandidateKeysActionPerformed
+
+    private void rePaintDepFunc(TreeSetListModel model) {
+        model.clear();
         for (int i = 0; i < relation.getDependencies().size(); i++) {
-            tslmDepFuncionales.add(relation.getDependencies().get(i));
+            model.add(relation.getDependencies().get(i));
         }
     }
 
     public void addFuncDependency(FuncDependency funcDependency) {
         this.relation.getDependencies().add(funcDependency);
-        rePaintDepFunc();
+        rePaintDepFunc(tslmDepFuncionales);
         JOptionPane.showMessageDialog(this, "Se agregó la dependencia funcional correctamente", "Correcto", JOptionPane.INFORMATION_MESSAGE);
     }
 
     public void editFuncDependency(FuncDependency funcDependencyOld, FuncDependency funcDependencyNew) {
         this.relation.getDependencies().remove(funcDependencyOld);
         this.relation.getDependencies().add(funcDependencyNew);
-        rePaintDepFunc();
+        rePaintDepFunc(tslmDepFuncionales);
         JOptionPane.showMessageDialog(this, "Se modificó la dependencia funcional correctamente", "Correcto", JOptionPane.INFORMATION_MESSAGE);
     }
 
@@ -418,18 +622,34 @@ public class App extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddAtr;
     private javax.swing.JButton btnAddDepFunc;
+    private javax.swing.JButton btnCandidateKeys;
     private javax.swing.JButton btnCargar;
     private javax.swing.JButton btnDelAtr;
     private javax.swing.JButton btnDelDepFunc;
     private javax.swing.JButton btnEditAtr;
     private javax.swing.JButton btnEditDepFunc;
+    private javax.swing.JButton btnRemFuncDepRedundant;
+    private javax.swing.JButton btnRemStrangeElemLeft;
+    private javax.swing.JButton btnRightDecomposition;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JList<String> jlAtributos;
+    private javax.swing.JList<HashSet<String>> jlCandidateKeys;
     private javax.swing.JList<FuncDependency> jlDepFuncionales;
+    private javax.swing.JList<FuncDependency> jlRemFuncDepRedundant;
+    private javax.swing.JList<FuncDependency> jlRemStrangeElemLeft;
+    private javax.swing.JList<FuncDependency> jlRightDecomp;
     private javax.swing.JPanel jpAtributos;
+    private javax.swing.JPanel jpCandidateKeys;
     private javax.swing.JPanel jpDepFuncionales;
-    private javax.swing.JPanel jpResultados;
+    private javax.swing.JPanel jpRemFuncDepRedundant;
+    private javax.swing.JPanel jpRemStrangeElemLeft;
+    private javax.swing.JPanel jpRightDecomp;
+    private javax.swing.JTabbedPane jtpResultados;
     private javax.swing.JTabbedPane jtpVista;
     // End of variables declaration//GEN-END:variables
 }

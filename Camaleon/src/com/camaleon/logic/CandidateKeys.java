@@ -11,115 +11,126 @@ import java.util.Set;
 import com.camaleon.entities.FuncDependency;
 import com.camaleon.entities.Relation;
 import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
 
 public class CandidateKeys {
-	public static List<HashSet<String>> candidateKeys(Relation relation,
-			HashMap<HashSet<String>, HashSet<String>> closures) {
-		List<HashSet<String>> candidateKeys = new ArrayList<HashSet<String>>();
-		Function<FuncDependency, HashSet<String>> impliedFunction = new Function<FuncDependency, HashSet<String>>() {
-			@Override
-			public HashSet<String> apply(FuncDependency input) {
-				return input.getImplied();
-			}
-		};
 
-		Function<FuncDependency, HashSet<String>> implicantFunction = new Function<FuncDependency, HashSet<String>>() {
-			@Override
-			public HashSet<String> apply(FuncDependency input) {
-				return input.getImplicant();
-			}
-		};
+    public static List<HashSet<String>> candidateKeys(Relation relation,
+            HashMap<HashSet<String>, HashSet<String>> closures) {
+        List<HashSet<String>> candidateKeys = new ArrayList<HashSet<String>>();
+        Function<FuncDependency, HashSet<String>> impliedFunction = new Function<FuncDependency, HashSet<String>>() {
+            @Override
+            public HashSet<String> apply(FuncDependency input) {
+                return input.getImplied();
+            }
+        };
 
-		Set<HashSet<String>> implicant = new HashSet<HashSet<String>>(
-				Collections2.transform(relation.getDependencies(),
-						implicantFunction));
+        Function<FuncDependency, HashSet<String>> implicantFunction = new Function<FuncDependency, HashSet<String>>() {
+            @Override
+            public HashSet<String> apply(FuncDependency input) {
+                return input.getImplicant();
+            }
+        };
 
-		Set<HashSet<String>> implied = new HashSet<HashSet<String>>(
-				Collections2.transform(relation.getDependencies(),
-						impliedFunction));
+        Set<HashSet<String>> implicant = new HashSet<HashSet<String>>(
+                Collections2.transform(relation.getDependencies(),
+                        implicantFunction));
 
-		int attrSize = relation.getAttributes().size();
-		HashSet<String> yesHashSet = new HashSet<String>();
-		HashSet<String> noHashSet = new HashSet<String>();
-		HashSet<String> maybeHashSet = new HashSet<String>();
-		HashSet<String> impliedHashSet = new HashSet<String>();
-		HashSet<String> implicantHashSet = new HashSet<String>();
+        Set<HashSet<String>> implied = new HashSet<HashSet<String>>(
+                Collections2.transform(relation.getDependencies(),
+                        impliedFunction));
 
-		for (HashSet<String> hashSet : implied) {
-			impliedHashSet.addAll(hashSet);
-		}
+        int attrSize = relation.getAttributes().size();
+        HashSet<String> yesHashSet = new HashSet<String>();
+        HashSet<String> noHashSet = new HashSet<String>();
+        HashSet<String> maybeHashSet = new HashSet<String>();
+        HashSet<String> impliedHashSet = new HashSet<String>();
+        HashSet<String> implicantHashSet = new HashSet<String>();
 
-		for (HashSet<String> hashSet : implicant) {
-			implicantHashSet.addAll(hashSet);
-		}
+        for (HashSet<String> hashSet : implied) {
+            impliedHashSet.addAll(hashSet);
+        }
 
-		SetView<String> yesSet = Sets.difference(relation.getAttributes(),
-				impliedHashSet);
-		SetView<String> noSet = Sets.difference(relation.getAttributes(),
-				implicantHashSet);
-		noHashSet = new HashSet<String>(noSet);
+        for (HashSet<String> hashSet : implicant) {
+            implicantHashSet.addAll(hashSet);
+        }
 
-		if (yesSet.size() > 0) {
-			yesHashSet = new HashSet<String>(yesSet);
-			HashSet<String> closureYesSet = Util.closure(yesHashSet,
-					relation.getDependencies(), closures);
-			if (closureYesSet.size() == relation.getAttributes().size()) {
-				candidateKeys.add(yesHashSet);
-				return candidateKeys;
-			}
-			SetView<String> maybeSet = Sets.difference(
-					relation.getAttributes(), yesHashSet);
-			maybeHashSet = new HashSet<String>(maybeSet);
-		} else {
-			maybeHashSet = new HashSet<String>(relation.getAttributes());
-		}
+        SetView<String> yesSet = Sets.difference(relation.getAttributes(),
+                impliedHashSet);
+        SetView<String> noSet = Sets.difference(relation.getAttributes(),
+                implicantHashSet);
+        noHashSet = new HashSet<String>(noSet);
 
-		if (noHashSet.size() > 0 && noHashSet.size() < attrSize) {
-			SetView<String> maybeSet = Sets.difference(maybeHashSet, noHashSet);
-			maybeHashSet = new HashSet<String>(maybeSet);
-		}
+        if (yesSet.size() > 0) {
+            yesHashSet = new HashSet<String>(yesSet);
+            HashSet<String> closureYesSet = Util.closure(yesHashSet,
+                    relation.getDependencies(), closures);
+            if (closureYesSet.size() == relation.getAttributes().size()) {
+                candidateKeys.add(yesHashSet);
+                return candidateKeys;
+            }
+            SetView<String> maybeSet = Sets.difference(
+                    relation.getAttributes(), yesHashSet);
+            maybeHashSet = new HashSet<String>(maybeSet);
+        } else {
+            maybeHashSet = new HashSet<String>(relation.getAttributes());
+        }
 
-		Set<Set<String>> powerSet = Sets.powerSet(maybeHashSet);
-		List<Set<String>> powerList = new ArrayList<Set<String>>(powerSet);
+        if (noHashSet.size() > 0 && noHashSet.size() < attrSize) {
+            SetView<String> maybeSet = Sets.difference(maybeHashSet, noHashSet);
+            maybeHashSet = new HashSet<String>(maybeSet);
+        }
 
-		Collections.sort(powerList, new Comparator<Set<String>>() {
+        Set<Set<String>> powerSet = Sets.powerSet(maybeHashSet);
+        List<Set<String>> powerList = new ArrayList<Set<String>>(powerSet);
 
-			@Override
-			public int compare(Set<String> o1, Set<String> o2) {
-				return o1.hashCode() - o2.hashCode();
-			}
-		});
+        Collections.sort(powerList, new Comparator<Set<String>>() {
 
-		for (int i = 1; i < powerList.size(); i++) {
-			final HashSet<String> trySet = new HashSet<String>(powerList.get(i));
-			HashSet<String> tempTrySet = new HashSet<String>(trySet);
-			if (yesHashSet.size() > 0) {
-				tempTrySet.addAll(yesHashSet);
-			}
-			HashSet<String> closure = Util.closure(tempTrySet,
-					relation.getDependencies(), closures);
-			if (closure.size() == attrSize) {
-				candidateKeys.add(tempTrySet);
-				Predicate<Set<String>> subCombinationsPredicate = new Predicate<Set<String>>() {
-					@Override
-					public boolean apply(Set<String> input) {
-						return (input.containsAll(trySet));
-					}
-				};
+            @Override
+            public int compare(Set<String> o1, Set<String> o2) {
+                return o1.hashCode() - o2.hashCode();
+            }
+        });
 
-				ArrayList<Set<String>> subCombinations = new ArrayList<Set<String>>(
-						Collections2
-								.filter(powerList, subCombinationsPredicate));
-				powerList.removeAll(subCombinations);
-				i--;
-			}
+        for (int i = 1; i < powerList.size(); i++) {
+            final HashSet<String> trySet = new HashSet<String>(powerList.get(i));
+            HashSet<String> tempTrySet = new HashSet<String>(trySet);
+            if (yesHashSet.size() > 0) {
+                tempTrySet.addAll(yesHashSet);
+            }
+            HashSet<String> closure = Util.closure(tempTrySet,
+                    relation.getDependencies(), closures);
+            if (closure.size() == attrSize) {
+                candidateKeys.add(tempTrySet);
+                Predicate<Set<String>> subCombinationsPredicate = new Predicate<Set<String>>() {
+                    @Override
+                    public boolean apply(Set<String> input) {
+                        return (input.containsAll(trySet));
+                    }
+                };
 
-		}
+                ArrayList<Set<String>> subCombinations = new ArrayList<Set<String>>(
+                        Collections2
+                        .filter(powerList, subCombinationsPredicate));
+                powerList.removeAll(subCombinations);
+                i--;
+            }
 
-		return candidateKeys;
-	}
+        }
+
+        Collections.sort(candidateKeys, new Comparator<HashSet>() {
+            @Override
+            public int compare(HashSet o1, HashSet o2) {
+                String s1 = Joiner.on("").join(o1);
+                String s2 = Joiner.on("").join(o2);
+                return s1.compareTo(s2);
+            }
+
+        });
+        return candidateKeys;
+    }
 }
