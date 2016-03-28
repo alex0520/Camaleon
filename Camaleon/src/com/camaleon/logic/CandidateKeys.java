@@ -122,15 +122,7 @@ public class CandidateKeys {
 
         }
 
-        Collections.sort(candidateKeys, new Comparator<HashSet>() {
-            @Override
-            public int compare(HashSet o1, HashSet o2) {
-                String s1 = Joiner.on("").join(o1);
-                String s2 = Joiner.on("").join(o2);
-                return s1.compareTo(s2);
-            }
-
-        });
+        Collections.sort(candidateKeys, Util.hashSetComparator);
         return candidateKeys;
     }
 }
