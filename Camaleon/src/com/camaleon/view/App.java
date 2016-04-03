@@ -46,7 +46,6 @@ public class App extends javax.swing.JFrame {
     DefaultListModel<HashSet<String>> dlmCandidateKeys = new DefaultListModel<HashSet<String>>();
     DefaultListModel<HashSet<String>> dlmGetPartitions = new DefaultListModel<HashSet<String>>();
     DefaultListModel<HashSet<String>> dlmRemPartDuplicadas = new DefaultListModel<HashSet<String>>();
-    DefaultListModel<HashSet<String>> dlmCheckKeys = new DefaultListModel<HashSet<String>>();
 
     /**
      * Creates new form App
@@ -61,7 +60,6 @@ public class App extends javax.swing.JFrame {
         jlCandidateKeys.setModel(dlmCandidateKeys);
         jlGetPartitions.setModel(dlmGetPartitions);
         jlRemPartDuplicadas.setModel(dlmRemPartDuplicadas);
-        jlCheckKeys.setModel(dlmCheckKeys);
         jtpVista.setEnabledAt(1, false);
     }
 
@@ -113,10 +111,6 @@ public class App extends javax.swing.JFrame {
         jScrollPane8 = new javax.swing.JScrollPane();
         jlRemPartDuplicadas = new javax.swing.JList<>();
         btnRemPartDuplicadas = new javax.swing.JButton();
-        jpCheckKeys = new javax.swing.JPanel();
-        jScrollPane9 = new javax.swing.JScrollPane();
-        jlCheckKeys = new javax.swing.JList<>();
-        btnCheckKeys = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Camaleon");
@@ -461,40 +455,6 @@ public class App extends javax.swing.JFrame {
 
         jtpResultados.addTab("Rem. Particiones Dup.", jpRemPartDuplicadas);
 
-        jScrollPane9.setViewportView(jlCheckKeys);
-
-        btnCheckKeys.setText("Calcular");
-        btnCheckKeys.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCheckKeysActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jpCheckKeysLayout = new javax.swing.GroupLayout(jpCheckKeys);
-        jpCheckKeys.setLayout(jpCheckKeysLayout);
-        jpCheckKeysLayout.setHorizontalGroup(
-            jpCheckKeysLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jpCheckKeysLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jpCheckKeysLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane9, javax.swing.GroupLayout.DEFAULT_SIZE, 754, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpCheckKeysLayout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(btnCheckKeys)))
-                .addContainerGap())
-        );
-        jpCheckKeysLayout.setVerticalGroup(
-            jpCheckKeysLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jpCheckKeysLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane9, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnCheckKeys)
-                .addContainerGap(15, Short.MAX_VALUE))
-        );
-
-        jtpResultados.addTab("Verificar Llaves", jpCheckKeys);
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -653,67 +613,6 @@ public class App extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnDelDepFuncActionPerformed
 
-    private void btnRightDecompositionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRightDecompositionActionPerformed
-        if (relation.getDependencies().size() > 0) {
-            relation.setDependencies(MinimalCover.rightDecomposition(relation
-                    .getDependencies()));
-            rePaintDepFunc(tslmRightDecomp);
-            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Se realizó descomposición a la derecha correctamente", "Correcto", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Ud debe crear al menos una dependencia funcional para utilizar esta opción", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }//GEN-LAST:event_btnRightDecompositionActionPerformed
-
-    private void btnRemStrangeElemLeftActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemStrangeElemLeftActionPerformed
-        if (relation.getDependencies().size() > 0) {
-            relation.setDependencies(MinimalCover.removeStrangeElemLeft(
-                    relation.getDependencies(), closures));
-            rePaintDepFunc(tslmRemStrangeElemLeft);
-            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Se eliminaron elementos extraños a izquierda correctamente", "Correcto", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Ud debe crear al menos una dependencia funcional para utilizar esta opción", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }//GEN-LAST:event_btnRemStrangeElemLeftActionPerformed
-
-    private void btnRemFuncDepRedundantActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemFuncDepRedundantActionPerformed
-        if (relation.getDependencies().size() > 1) {
-            relation.setDependencies(MinimalCover.removeRedundantDependencies(
-                    relation.getDependencies()));
-            rePaintDepFunc(tslmRemFuncDepRedundant);
-            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Se eliminaron dependencias funcionales redundantes correctamente", "Correcto", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Ud debe crear al menos dos dependencia funcional para utilizar esta opción", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }//GEN-LAST:event_btnRemFuncDepRedundantActionPerformed
-
-    private void btnCandidateKeysActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCandidateKeysActionPerformed
-        if (relation.getDependencies().size() > 0) {
-            keys = CandidateKeys.candidateKeys(relation,
-                    closures);
-            dlmCandidateKeys.clear();
-            for (int i = 0; i < keys.size(); i++) {
-                dlmCandidateKeys.addElement(keys.get(i));
-            }
-            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Se calcularon las llaves candidatas de la relación correctamente", "Correcto", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Ud debe crear al menos una dependencia funcional para utilizar esta opción", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-
-    }//GEN-LAST:event_btnCandidateKeysActionPerformed
-
-    private void btnGetPartitionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGetPartitionsActionPerformed
-        if (relation.getDependencies().size() > 0) {
-            partitions = Bernstein.getPartitions(relation.getDependencies());
-            dlmGetPartitions.clear();
-            for (Map.Entry<String, HashSet<String>> entry : partitions.entrySet()) {
-                dlmGetPartitions.addElement(entry.getValue());
-            }
-            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Se calcularon las particiones de la relación correctamente", "Correcto", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Ud debe crear al menos una dependencia funcional para utilizar esta opción", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }//GEN-LAST:event_btnGetPartitionsActionPerformed
-
     private void btnRemPartDuplicadasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemPartDuplicadasActionPerformed
         if (partitions.size() > 0) {
             cleanPartitions = Bernstein.remDupPartitions(partitions);
@@ -727,18 +626,65 @@ public class App extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnRemPartDuplicadasActionPerformed
 
-    private void btnCheckKeysActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCheckKeysActionPerformed
-        if (cleanPartitions.size() > 0 && keys.size() > 0) {
-            cleanPartitions = Bernstein.checkKeys(cleanPartitions,keys);
-            dlmCheckKeys.clear();
-            for (int i = 0; i < cleanPartitions.size(); i++) {
-                dlmCheckKeys.addElement(cleanPartitions.get(i));
+    private void btnGetPartitionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGetPartitionsActionPerformed
+        if (relation.getDependencies().size() > 0) {
+            partitions = Bernstein.getPartitions(relation.getAttributes(),relation.getDependencies());
+            dlmGetPartitions.clear();
+            for (Map.Entry<String, HashSet<String>> entry : partitions.entrySet()) {
+                dlmGetPartitions.addElement(entry.getValue());
             }
-            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Se eliminaron las particiones duplicadas de la relación correctamente", "Correcto", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Se calcularon las particiones de la relación correctamente", "Correcto", JOptionPane.INFORMATION_MESSAGE);
         } else {
-            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Ud debe calcular las particiones, llaves candidatas y eliminar las particiones duplicadas de la relaciòn antes de utilizar esta opción", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Ud debe crear al menos una dependencia funcional para utilizar esta opción", "Error", JOptionPane.ERROR_MESSAGE);
         }
-    }//GEN-LAST:event_btnCheckKeysActionPerformed
+    }//GEN-LAST:event_btnGetPartitionsActionPerformed
+
+    private void btnCandidateKeysActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCandidateKeysActionPerformed
+        if (relation.getDependencies().size() > 0) {
+            keys = CandidateKeys.candidateKeys(relation,
+                closures);
+            dlmCandidateKeys.clear();
+            for (int i = 0; i < keys.size(); i++) {
+                dlmCandidateKeys.addElement(keys.get(i));
+            }
+            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Se calcularon las llaves candidatas de la relación correctamente", "Correcto", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Ud debe crear al menos una dependencia funcional para utilizar esta opción", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnCandidateKeysActionPerformed
+
+    private void btnRemFuncDepRedundantActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemFuncDepRedundantActionPerformed
+        if (relation.getDependencies().size() > 1) {
+            relation.setDependencies(MinimalCover.removeRedundantDependencies(
+                relation.getDependencies()));
+        rePaintDepFunc(tslmRemFuncDepRedundant);
+        JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Se eliminaron dependencias funcionales redundantes correctamente", "Correcto", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Ud debe crear al menos dos dependencia funcional para utilizar esta opción", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnRemFuncDepRedundantActionPerformed
+
+    private void btnRemStrangeElemLeftActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemStrangeElemLeftActionPerformed
+        if (relation.getDependencies().size() > 0) {
+            relation.setDependencies(MinimalCover.removeStrangeElemLeft(
+                relation.getDependencies(), closures));
+        rePaintDepFunc(tslmRemStrangeElemLeft);
+        JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Se eliminaron elementos extraños a izquierda correctamente", "Correcto", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Ud debe crear al menos una dependencia funcional para utilizar esta opción", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnRemStrangeElemLeftActionPerformed
+
+    private void btnRightDecompositionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRightDecompositionActionPerformed
+        if (relation.getDependencies().size() > 0) {
+            relation.setDependencies(MinimalCover.rightDecomposition(relation
+                .getDependencies()));
+        rePaintDepFunc(tslmRightDecomp);
+        JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Se realizó descomposición a la derecha correctamente", "Correcto", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Ud debe crear al menos una dependencia funcional para utilizar esta opción", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnRightDecompositionActionPerformed
 
     private void rePaintDepFunc(TreeSetListModel model) {
         model.clear();
@@ -768,7 +714,6 @@ public class App extends javax.swing.JFrame {
         tslmRemFuncDepRedundant.clear();
         dlmCandidateKeys.clear();
         dlmGetPartitions.clear();
-        dlmCheckKeys.clear();
         dlmRemPartDuplicadas.clear();
         jtpVista.setSelectedIndex(0);
         jtpVista.setEnabledAt(1, false);
@@ -819,7 +764,6 @@ public class App extends javax.swing.JFrame {
     private javax.swing.JButton btnAddDepFunc;
     private javax.swing.JButton btnCandidateKeys;
     private javax.swing.JButton btnCargar;
-    private javax.swing.JButton btnCheckKeys;
     private javax.swing.JButton btnDelAtr;
     private javax.swing.JButton btnDelDepFunc;
     private javax.swing.JButton btnEditAtr;
@@ -837,10 +781,8 @@ public class App extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JScrollPane jScrollPane8;
-    private javax.swing.JScrollPane jScrollPane9;
     private javax.swing.JList<String> jlAtributos;
     private javax.swing.JList<HashSet<String>> jlCandidateKeys;
-    private javax.swing.JList<HashSet<String>> jlCheckKeys;
     private javax.swing.JList<FuncDependency> jlDepFuncionales;
     private javax.swing.JList<HashSet<String>> jlGetPartitions;
     private javax.swing.JList<FuncDependency> jlRemFuncDepRedundant;
@@ -849,7 +791,6 @@ public class App extends javax.swing.JFrame {
     private javax.swing.JList<FuncDependency> jlRightDecomp;
     private javax.swing.JPanel jpAtributos;
     private javax.swing.JPanel jpCandidateKeys;
-    private javax.swing.JPanel jpCheckKeys;
     private javax.swing.JPanel jpDepFuncionales;
     private javax.swing.JPanel jpGetPartitions;
     private javax.swing.JPanel jpRemFuncDepRedundant;

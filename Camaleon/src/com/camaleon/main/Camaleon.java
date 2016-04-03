@@ -6,9 +6,11 @@ import java.util.HashSet;
 import java.util.List;
 
 import com.camaleon.entities.Relation;
+import com.camaleon.logic.Bernstein;
 import com.camaleon.logic.CandidateKeys;
 import com.camaleon.logic.LoadFile;
 import com.camaleon.logic.MinimalCover;
+import java.util.TreeMap;
 
 public class Camaleon {
 
@@ -45,6 +47,9 @@ public class Camaleon {
                     closures);
 
             System.out.println("LLaves Candidatas: " + keys);
+
+            List<Relation> bernstein = Bernstein.getBernstein(relacion.getAttributes(), relacion.getDependencies());
+            System.out.println("Bernstein:" + bernstein);
         }
 
     }
