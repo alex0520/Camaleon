@@ -8,8 +8,8 @@ import java.util.TreeMap;
 
 import com.camaleon.entities.FuncDependency;
 import com.camaleon.entities.Relation;
-import com.camaleon.proyeccion.Dependencia;
-import com.camaleon.proyeccion.Proyeccion;
+import com.camaleon.logic.proyeccion.Dependencia;
+import com.camaleon.logic.proyeccion.Proyeccion;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;

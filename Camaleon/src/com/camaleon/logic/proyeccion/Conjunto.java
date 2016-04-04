@@ -1,4 +1,4 @@
-package com.camaleon.proyeccion;
+package com.camaleon.logic.proyeccion;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
