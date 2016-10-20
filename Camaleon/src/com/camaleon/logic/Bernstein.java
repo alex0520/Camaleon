@@ -14,8 +14,11 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -83,20 +86,24 @@ public class Bernstein {
     public static List<HashSet<String>> remDupPartitions(TreeMap<String, HashSet<String>> partitions) {
         List<HashSet<String>> cleanPartitions = new ArrayList<HashSet<String>>();
         int i = 0;
-        for (Map.Entry<String, HashSet<String>> partition : partitions.entrySet()) {
+        LinkedList<HashSet<String>> list = new LinkedList(partitions.values());
+        
+        Collections.sort(list, (HashSet<String> o1, HashSet<String> o2) -> o2.size() - o1.size());
+        
+        for(HashSet<String> partition : list ){
             if (i == 0) {
-                cleanPartitions.add(partition.getValue());
+                cleanPartitions.add(partition);
             }
             boolean duplicate = false;
             for (int j = 0; j < cleanPartitions.size(); j++) {
                 HashSet<String> hashSet = cleanPartitions.get(j);
-                if (hashSet.containsAll(partition.getValue())) {
+                if (hashSet.containsAll(partition)) {
                     duplicate = true;
                     break;
                 }
             }
             if (!duplicate) {
-                cleanPartitions.add(partition.getValue());
+                cleanPartitions.add(partition);
             }
             i++;
         }

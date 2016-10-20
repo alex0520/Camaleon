@@ -8,6 +8,8 @@ package com.camaleon.view;
 import com.camaleon.entities.FuncDependency;
 import com.camaleon.entities.LoadFileResult;
 import com.camaleon.entities.Relation;
+import com.camaleon.entities.RelationTableConverter;
+import com.camaleon.entities.Table;
 import com.camaleon.entities.TreeSetListModel;
 import com.camaleon.logic.Bernstein;
 import com.camaleon.logic.CandidateKeys;
@@ -22,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -45,11 +48,9 @@ public class App extends javax.swing.JFrame {
     HashMap<HashSet<String>, HashSet<String>> closures = new HashMap<HashSet<String>, HashSet<String>>();
     TreeSetListModel<String> tslmAtributos = new TreeSetListModel<String>(String.CASE_INSENSITIVE_ORDER);
     TreeSetListModel<FuncDependency> tslmDepFuncionales = new TreeSetListModel<FuncDependency>();
-    TreeSetListModel<FuncDependency> tslmRightDecomp = new TreeSetListModel<FuncDependency>();
-    TreeSetListModel<FuncDependency> tslmRemStrangeElemLeft = new TreeSetListModel<FuncDependency>();
-    TreeSetListModel<FuncDependency> tslmRemFuncDepRedundant = new TreeSetListModel<FuncDependency>();
-    DefaultListModel<HashSet<String>> dlmCandidateKeys = new DefaultListModel<HashSet<String>>();
-    DefaultListModel<Relation> dlmGetPartitions = new DefaultListModel<Relation>();
+    DefaultListModel<Table> dlmSintesis = new DefaultListModel<Table>();
+    List<Table> tables = new LinkedList<>();
+    RelationTableConverter relationTableConverter = new RelationTableConverter();
 
     /**
      * Creates new form App
@@ -58,11 +59,7 @@ public class App extends javax.swing.JFrame {
         initComponents();
         jlAtributos.setModel(tslmAtributos);
         jlDepFuncionales.setModel(tslmDepFuncionales);
-        jlRightDecomp.setModel(tslmRightDecomp);
-        jlRemStrangeElemLeft.setModel(tslmRemStrangeElemLeft);
-        jlRemFuncDepRedundant.setModel(tslmRemFuncDepRedundant);
-        jlCandidateKeys.setModel(dlmCandidateKeys);
-        jlGetPartitions.setModel(dlmGetPartitions);
+        jlSintesis.setModel(dlmSintesis);
         jtpVista.setEnabledAt(1, false);
     }
 
@@ -92,26 +89,11 @@ public class App extends javax.swing.JFrame {
         btnDelDepFunc = new javax.swing.JButton();
         btnCargar = new javax.swing.JButton();
         jtpResultados = new javax.swing.JTabbedPane();
-        jpRightDecomp = new javax.swing.JPanel();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        jlRightDecomp = new javax.swing.JList<>();
-        btnRightDecomposition = new javax.swing.JButton();
-        jpRemStrangeElemLeft = new javax.swing.JPanel();
-        jScrollPane4 = new javax.swing.JScrollPane();
-        jlRemStrangeElemLeft = new javax.swing.JList<>();
-        btnRemStrangeElemLeft = new javax.swing.JButton();
-        jpRemFuncDepRedundant = new javax.swing.JPanel();
-        jScrollPane5 = new javax.swing.JScrollPane();
-        jlRemFuncDepRedundant = new javax.swing.JList<>();
-        btnRemFuncDepRedundant = new javax.swing.JButton();
-        jpCandidateKeys = new javax.swing.JPanel();
-        jScrollPane6 = new javax.swing.JScrollPane();
-        jlCandidateKeys = new javax.swing.JList<>();
-        btnCandidateKeys = new javax.swing.JButton();
-        jpGetPartitions = new javax.swing.JPanel();
-        jScrollPane7 = new javax.swing.JScrollPane();
-        jlGetPartitions = new javax.swing.JList<>();
-        btnGetPartitions = new javax.swing.JButton();
+        jpSintesis = new javax.swing.JPanel();
+        jScrollPane8 = new javax.swing.JScrollPane();
+        jlSintesis = new javax.swing.JList<>();
+        btnSintesis = new javax.swing.JButton();
+        btnScript = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Camaleon");
@@ -172,7 +154,7 @@ public class App extends javax.swing.JFrame {
             .addGroup(jpAtributosLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jpAtributosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 754, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 1075, Short.MAX_VALUE)
                     .addGroup(jpAtributosLayout.createSequentialGroup()
                         .addComponent(btnAddAtr)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -242,7 +224,7 @@ public class App extends javax.swing.JFrame {
             .addGroup(jpDepFuncionalesLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jpDepFuncionalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 754, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 1075, Short.MAX_VALUE)
                     .addGroup(jpDepFuncionalesLayout.createSequentialGroup()
                         .addComponent(btnAddDepFunc)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -274,175 +256,50 @@ public class App extends javax.swing.JFrame {
             }
         });
 
-        jScrollPane3.setViewportView(jlRightDecomp);
+        jScrollPane8.setViewportView(jlSintesis);
 
-        btnRightDecomposition.setText("Calcular");
-        btnRightDecomposition.addActionListener(new java.awt.event.ActionListener() {
+        btnSintesis.setText("Calcular");
+        btnSintesis.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnRightDecompositionActionPerformed(evt);
+                btnSintesisActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout jpRightDecompLayout = new javax.swing.GroupLayout(jpRightDecomp);
-        jpRightDecomp.setLayout(jpRightDecompLayout);
-        jpRightDecompLayout.setHorizontalGroup(
-            jpRightDecompLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jpRightDecompLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jpRightDecompLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 754, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpRightDecompLayout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(btnRightDecomposition)))
-                .addContainerGap())
-        );
-        jpRightDecompLayout.setVerticalGroup(
-            jpRightDecompLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jpRightDecompLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnRightDecomposition)
-                .addContainerGap(15, Short.MAX_VALUE))
-        );
-
-        jtpResultados.addTab("Desc. Derecha", jpRightDecomp);
-
-        jScrollPane4.setViewportView(jlRemStrangeElemLeft);
-
-        btnRemStrangeElemLeft.setText("Calcular");
-        btnRemStrangeElemLeft.addActionListener(new java.awt.event.ActionListener() {
+        btnScript.setText("Generar Script");
+        btnScript.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnRemStrangeElemLeftActionPerformed(evt);
+                btnScriptActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout jpRemStrangeElemLeftLayout = new javax.swing.GroupLayout(jpRemStrangeElemLeft);
-        jpRemStrangeElemLeft.setLayout(jpRemStrangeElemLeftLayout);
-        jpRemStrangeElemLeftLayout.setHorizontalGroup(
-            jpRemStrangeElemLeftLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jpRemStrangeElemLeftLayout.createSequentialGroup()
+        javax.swing.GroupLayout jpSintesisLayout = new javax.swing.GroupLayout(jpSintesis);
+        jpSintesis.setLayout(jpSintesisLayout);
+        jpSintesisLayout.setHorizontalGroup(
+            jpSintesisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jpSintesisLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jpRemStrangeElemLeftLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 754, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpRemStrangeElemLeftLayout.createSequentialGroup()
+                .addGroup(jpSintesisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 1075, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpSintesisLayout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(btnRemStrangeElemLeft)))
+                        .addComponent(btnScript)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnSintesis)))
                 .addContainerGap())
         );
-        jpRemStrangeElemLeftLayout.setVerticalGroup(
-            jpRemStrangeElemLeftLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jpRemStrangeElemLeftLayout.createSequentialGroup()
+        jpSintesisLayout.setVerticalGroup(
+            jpSintesisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jpSintesisLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnRemStrangeElemLeft)
+                .addGroup(jpSintesisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnSintesis)
+                    .addComponent(btnScript))
                 .addContainerGap(15, Short.MAX_VALUE))
         );
 
-        jtpResultados.addTab("Rem. Elem. Extraños Izq.", jpRemStrangeElemLeft);
-
-        jScrollPane5.setViewportView(jlRemFuncDepRedundant);
-
-        btnRemFuncDepRedundant.setText("Calcular");
-        btnRemFuncDepRedundant.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnRemFuncDepRedundantActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jpRemFuncDepRedundantLayout = new javax.swing.GroupLayout(jpRemFuncDepRedundant);
-        jpRemFuncDepRedundant.setLayout(jpRemFuncDepRedundantLayout);
-        jpRemFuncDepRedundantLayout.setHorizontalGroup(
-            jpRemFuncDepRedundantLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jpRemFuncDepRedundantLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jpRemFuncDepRedundantLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 754, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpRemFuncDepRedundantLayout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(btnRemFuncDepRedundant)))
-                .addContainerGap())
-        );
-        jpRemFuncDepRedundantLayout.setVerticalGroup(
-            jpRemFuncDepRedundantLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jpRemFuncDepRedundantLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnRemFuncDepRedundant)
-                .addContainerGap(15, Short.MAX_VALUE))
-        );
-
-        jtpResultados.addTab("Rem. Dep. Func. Redundantes", jpRemFuncDepRedundant);
-
-        jScrollPane6.setViewportView(jlCandidateKeys);
-
-        btnCandidateKeys.setText("Calcular");
-        btnCandidateKeys.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCandidateKeysActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jpCandidateKeysLayout = new javax.swing.GroupLayout(jpCandidateKeys);
-        jpCandidateKeys.setLayout(jpCandidateKeysLayout);
-        jpCandidateKeysLayout.setHorizontalGroup(
-            jpCandidateKeysLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jpCandidateKeysLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jpCandidateKeysLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 754, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpCandidateKeysLayout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(btnCandidateKeys)))
-                .addContainerGap())
-        );
-        jpCandidateKeysLayout.setVerticalGroup(
-            jpCandidateKeysLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jpCandidateKeysLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnCandidateKeys)
-                .addContainerGap(15, Short.MAX_VALUE))
-        );
-
-        jtpResultados.addTab("Llaves Candidatas", jpCandidateKeys);
-
-        jScrollPane7.setViewportView(jlGetPartitions);
-
-        btnGetPartitions.setText("Calcular");
-        btnGetPartitions.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGetPartitionsActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jpGetPartitionsLayout = new javax.swing.GroupLayout(jpGetPartitions);
-        jpGetPartitions.setLayout(jpGetPartitionsLayout);
-        jpGetPartitionsLayout.setHorizontalGroup(
-            jpGetPartitionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jpGetPartitionsLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jpGetPartitionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 754, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpGetPartitionsLayout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(btnGetPartitions)))
-                .addContainerGap())
-        );
-        jpGetPartitionsLayout.setVerticalGroup(
-            jpGetPartitionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jpGetPartitionsLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnGetPartitions)
-                .addContainerGap(15, Short.MAX_VALUE))
-        );
-
-        jtpResultados.addTab("Bernstein", jpGetPartitions);
+        jtpResultados.addTab("Sintesis", jpSintesis);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -514,7 +371,7 @@ public class App extends javax.swing.JFrame {
     private void btnAddAtrActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddAtrActionPerformed
         String attr = JOptionPane.showInputDialog(
                 JOptionPane
-                .getFrameForComponent((Component) evt.getSource()),
+                        .getFrameForComponent((Component) evt.getSource()),
                 "Ingrese el atributo",
                 "Nuevo Atributo",
                 JOptionPane.QUESTION_MESSAGE
@@ -525,6 +382,7 @@ public class App extends javax.swing.JFrame {
             if (tslmAtributos.getSize() > 1) {
                 jtpVista.setEnabledAt(1, true);
             }
+            dlmSintesis.clear();
         }
 
     }//GEN-LAST:event_btnAddAtrActionPerformed
@@ -552,6 +410,7 @@ public class App extends javax.swing.JFrame {
                 tslmAtributos.remove(attr);
                 tslmAtributos.add(newAttr);
                 rePaintDepFunc(tslmDepFuncionales);
+                dlmSintesis.clear();
             }
         }
     }//GEN-LAST:event_btnEditAtrActionPerformed
@@ -564,6 +423,7 @@ public class App extends javax.swing.JFrame {
                 relation.delAttr(attr);
                 tslmAtributos.remove(attr);
                 rePaintDepFunc(tslmDepFuncionales);
+                dlmSintesis.clear();
             }
         }
     }//GEN-LAST:event_btnDelAtrActionPerformed
@@ -571,7 +431,7 @@ public class App extends javax.swing.JFrame {
     private void btnAddDepFuncActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddDepFuncActionPerformed
         FuncDependencyForm funcDependencyForm = new FuncDependencyForm(this, new FuncDependency(), relation.getAttributes());
         funcDependencyForm.setVisible(true);
-
+        dlmSintesis.clear();
     }//GEN-LAST:event_btnAddDepFuncActionPerformed
 
     private void btnEditDepFuncActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditDepFuncActionPerformed
@@ -579,6 +439,7 @@ public class App extends javax.swing.JFrame {
             FuncDependency funcDep = jlDepFuncionales.getSelectedValue();
             FuncDependencyForm funcDependencyForm = new FuncDependencyForm(this, funcDep, relation.getAttributes());
             funcDependencyForm.setVisible(true);
+            dlmSintesis.clear();
         }
     }//GEN-LAST:event_btnEditDepFuncActionPerformed
 
@@ -600,71 +461,10 @@ public class App extends javax.swing.JFrame {
                 relation.getDependencies().remove(funcDep);
                 tslmDepFuncionales.remove(funcDep);
                 rePaintDepFunc(tslmDepFuncionales);
+                dlmSintesis.clear();
             }
         }
     }//GEN-LAST:event_btnDelDepFuncActionPerformed
-
-    private void btnGetPartitionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGetPartitionsActionPerformed
-        if (relation.getDependencies().size() > 0) {
-            List<Relation> bernstein = Bernstein.getBernstein(relation.getAttributes(), relation.getDependencies());
-            dlmGetPartitions.clear();
-            for (int i = 0; i < bernstein.size(); i++) {
-                dlmGetPartitions.addElement(bernstein.get(i));
-            }
-            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Se calcularon las particiones de la relación correctamente", "Correcto", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Ud debe crear al menos una dependencia funcional para utilizar esta opción", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }//GEN-LAST:event_btnGetPartitionsActionPerformed
-
-    private void btnCandidateKeysActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCandidateKeysActionPerformed
-        if (relation.getDependencies().size() > 0) {
-            keys = CandidateKeys.candidateKeys(relation,
-                    closures);
-            dlmCandidateKeys.clear();
-            for (int i = 0; i < keys.size(); i++) {
-                dlmCandidateKeys.addElement(keys.get(i));
-            }
-            btn2FormaNormal.setEnabled(true);
-            btn3aFormaNormal.setEnabled(true);
-            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Se calcularon las llaves candidatas de la relación correctamente", "Correcto", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Ud debe crear al menos una dependencia funcional para utilizar esta opción", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }//GEN-LAST:event_btnCandidateKeysActionPerformed
-
-    private void btnRemFuncDepRedundantActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemFuncDepRedundantActionPerformed
-        if (relation.getDependencies().size() > 1) {
-            relation.setDependencies(MinimalCover.removeRedundantDependencies(
-                    relation.getDependencies()));
-            rePaintDepFunc(tslmRemFuncDepRedundant);
-            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Se eliminaron dependencias funcionales redundantes correctamente", "Correcto", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Ud debe crear al menos dos dependencia funcional para utilizar esta opción", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }//GEN-LAST:event_btnRemFuncDepRedundantActionPerformed
-
-    private void btnRemStrangeElemLeftActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemStrangeElemLeftActionPerformed
-        if (relation.getDependencies().size() > 0) {
-            relation.setDependencies(MinimalCover.removeStrangeElemLeft(
-                    relation.getDependencies(), closures));
-            rePaintDepFunc(tslmRemStrangeElemLeft);
-            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Se eliminaron elementos extraños a izquierda correctamente", "Correcto", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Ud debe crear al menos una dependencia funcional para utilizar esta opción", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }//GEN-LAST:event_btnRemStrangeElemLeftActionPerformed
-
-    private void btnRightDecompositionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRightDecompositionActionPerformed
-        if (relation.getDependencies().size() > 0) {
-            relation.setDependencies(MinimalCover.rightDecomposition(relation
-                    .getDependencies()));
-            rePaintDepFunc(tslmRightDecomp);
-            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Se realizó descomposición a la derecha correctamente", "Correcto", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Ud debe crear al menos una dependencia funcional para utilizar esta opción", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }//GEN-LAST:event_btnRightDecompositionActionPerformed
 
     private void btn2FormaNormalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn2FormaNormalActionPerformed
         if (relation.getDependencies().size() > 0 && keys.size() > 0) {
@@ -752,6 +552,36 @@ public class App extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btn3aFormaNormalActionPerformed
 
+    private void btnSintesisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSintesisActionPerformed
+        if (relation.getDependencies().size() > 0) {
+            relation.setDependencies(MinimalCover.rightDecomposition(relation
+                    .getDependencies()));
+            relation.setDependencies(MinimalCover.removeStrangeElemLeft(
+                    relation.getDependencies(), closures));
+            relation.setDependencies(MinimalCover.removeRedundantDependencies(
+                    relation.getDependencies()));
+            keys = CandidateKeys.candidateKeys(relation,
+                    closures);
+            List<Relation> bernstein = Bernstein.getBernstein(relation.getAttributes(), relation.getDependencies());
+            dlmSintesis.clear();
+            for (int i = 0; i < bernstein.size(); i++) {
+                Table table = relationTableConverter.convert(bernstein.get(i));
+                tables.add(table);
+                dlmSintesis.addElement(table);
+            }
+            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Se calcularon las particiones de la relación correctamente", "Correcto", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Ud debe crear al menos una dependencia funcional para utilizar esta opción", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnSintesisActionPerformed
+
+    private void btnScriptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnScriptActionPerformed
+        
+        Script script = new Script(this, tables);
+        script.setVisible(true);
+        
+    }//GEN-LAST:event_btnScriptActionPerformed
+
     private void rePaintDepFunc(TreeSetListModel model) {
         model.clear();
         for (int i = 0; i < relation.getDependencies().size(); i++) {
@@ -775,11 +605,7 @@ public class App extends javax.swing.JFrame {
     public void cleanAll() {
         tslmAtributos.clear();
         tslmDepFuncionales.clear();
-        tslmRightDecomp.clear();
-        tslmRemStrangeElemLeft.clear();
-        tslmRemFuncDepRedundant.clear();
-        dlmCandidateKeys.clear();
-        dlmGetPartitions.clear();
+        dlmSintesis.clear();
         jtpVista.setSelectedIndex(0);
         jtpVista.setEnabledAt(1, false);
         jtpResultados.setSelectedIndex(0);
@@ -829,37 +655,22 @@ public class App extends javax.swing.JFrame {
     private javax.swing.JButton btn3aFormaNormal;
     private javax.swing.JButton btnAddAtr;
     private javax.swing.JButton btnAddDepFunc;
-    private javax.swing.JButton btnCandidateKeys;
     private javax.swing.JButton btnCargar;
     private javax.swing.JButton btnDelAtr;
     private javax.swing.JButton btnDelDepFunc;
     private javax.swing.JButton btnEditAtr;
     private javax.swing.JButton btnEditDepFunc;
-    private javax.swing.JButton btnGetPartitions;
-    private javax.swing.JButton btnRemFuncDepRedundant;
-    private javax.swing.JButton btnRemStrangeElemLeft;
-    private javax.swing.JButton btnRightDecomposition;
+    private javax.swing.JButton btnScript;
+    private javax.swing.JButton btnSintesis;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JScrollPane jScrollPane4;
-    private javax.swing.JScrollPane jScrollPane5;
-    private javax.swing.JScrollPane jScrollPane6;
-    private javax.swing.JScrollPane jScrollPane7;
+    private javax.swing.JScrollPane jScrollPane8;
     private javax.swing.JList<String> jlAtributos;
-    private javax.swing.JList<HashSet<String>> jlCandidateKeys;
     private javax.swing.JList<FuncDependency> jlDepFuncionales;
-    private javax.swing.JList<Relation> jlGetPartitions;
-    private javax.swing.JList<FuncDependency> jlRemFuncDepRedundant;
-    private javax.swing.JList<FuncDependency> jlRemStrangeElemLeft;
-    private javax.swing.JList<FuncDependency> jlRightDecomp;
+    private javax.swing.JList<Table> jlSintesis;
     private javax.swing.JPanel jpAtributos;
-    private javax.swing.JPanel jpCandidateKeys;
     private javax.swing.JPanel jpDepFuncionales;
-    private javax.swing.JPanel jpGetPartitions;
-    private javax.swing.JPanel jpRemFuncDepRedundant;
-    private javax.swing.JPanel jpRemStrangeElemLeft;
-    private javax.swing.JPanel jpRightDecomp;
+    private javax.swing.JPanel jpSintesis;
     private javax.swing.JTabbedPane jtpResultados;
     private javax.swing.JTabbedPane jtpVista;
     // End of variables declaration//GEN-END:variables
