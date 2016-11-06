@@ -9,8 +9,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- *
- * @author ASUS
+ * 
+ * @author Lizeth Valbuena, Alexander Lozano
  */
 public class Table {
     

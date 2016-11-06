@@ -8,8 +8,8 @@ package com.camaleon.entities;
 import com.google.common.base.Converter;
 
 /**
- *
- * @author ASUS
+ * 
+ * @author Lizeth Valbuena, Alexander Lozano
  */
 public class RelationTableConverter extends Converter<Relation, Table>{
 

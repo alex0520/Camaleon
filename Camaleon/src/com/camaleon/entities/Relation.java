@@ -3,7 +3,10 @@ package com.camaleon.entities;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-
+/**
+ * 
+ * @author Lizeth Valbuena, Alexander Lozano
+ */
 public class Relation {
 
     private HashSet<String> attributes;
@@ -43,7 +46,11 @@ public class Relation {
         return "Relation [attributes=" + attributes + ", dependencies="
                 + dependencies + "]";
     }
-
+/**
+ * 
+ * @param oldValue Valor Actual de un atributo
+ * @param newValue Nuevo Valor del atributo
+ */
     public void editAttr(String oldValue, String newValue) {
         this.attributes.remove(oldValue);
         this.attributes.add(newValue);
@@ -66,7 +73,10 @@ public class Relation {
             }
         }
     }
-
+    /**
+     * 
+     * @param oldValue Valor del atributo anterior 
+     */
     public void delAttr(String oldValue) {
         this.attributes.remove(oldValue);
         for (int i = 0; i < this.dependencies.size(); i++) {

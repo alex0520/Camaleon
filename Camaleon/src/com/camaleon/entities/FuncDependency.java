@@ -1,18 +1,26 @@
 package com.camaleon.entities;
 
 import java.util.HashSet;
-
+/**
+ * 
+ * @author Lizeth Valbuena, Alexander Lozano
+ */
 public class FuncDependency implements Comparable<FuncDependency> {
 
     private HashSet<String> implicant;
     private HashSet<String> implied;
 
+    
     public FuncDependency() {
         super();
         this.implicant = new HashSet<String>();
         this.implied = new HashSet<String>();
     }
-
+    /**
+     * 
+     * @param implicant Dato de tipo HashSet para el implicante
+     * @param implied Dato de tipo HashSet para el implicado
+     */
     public FuncDependency(HashSet<String> implicant, HashSet<String> implied) {
         super();
         this.implicant = implicant;
@@ -47,6 +55,7 @@ public class FuncDependency implements Comparable<FuncDependency> {
     }
 
     @Override
+    
     public int compareTo(FuncDependency o) {
         if (this.implicant.size() < o.implicant.size()) {
             return -1;

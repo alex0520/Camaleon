@@ -10,7 +10,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.TreeSet;
 import javax.swing.AbstractListModel;
-
+/**
+ * 
+ * @author Lizeth Valbuena, Alexander Lozano
+ * @param <T> Heredado de la Tabla
+ */
 public class TreeSetListModel<T extends Comparable<T>> extends AbstractListModel<T> {
 
     private static final long serialVersionUID = 1L;

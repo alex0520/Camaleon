@@ -16,9 +16,17 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
-
+/**
+ * LLaves Candidatas
+ * @author Lizeth Valbuena, Alexander Lozano
+ */
 public class CandidateKeys {
-
+    /**
+     * 
+     * @param relation Tipo de dato relación compuesto por una lista de atributos y dependencias funcionales correspondientes a un universo discurso
+     * @param closures Listado de clausuras previamente calculadas para dicho universo discurso.
+     * @return 
+     */
     public static List<HashSet<String>> candidateKeys(Relation relation,
             HashMap<HashSet<String>, HashSet<String>> closures) {
         List<HashSet<String>> candidateKeys = new ArrayList<HashSet<String>>();

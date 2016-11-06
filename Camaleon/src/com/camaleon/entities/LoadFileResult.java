@@ -3,7 +3,10 @@ package com.camaleon.entities;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
+/**
+ * 
+ * @author Lizeth Valbuena, Alexander Lozano
+ */
 public class LoadFileResult {
 
     public enum Status {

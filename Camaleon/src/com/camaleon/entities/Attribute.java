@@ -8,21 +8,25 @@ package com.camaleon.entities;
 import java.sql.JDBCType;
 
 /**
- *
- * @author ASUS
+ * 
+ * @author Lizeth Valbuena, Alexander Lozano
  */
 public class Attribute {
     
     private String name;
     private JDBCType type;
-
+    
     public Attribute() {
     }
-
+  
     public Attribute(String name) {
         this.name = name;
     }
-
+    /**
+     * 
+     * @param name Attribute
+     * @param type 
+     */
     public Attribute(String name, JDBCType type) {
         this.name = name;
         this.type = type;

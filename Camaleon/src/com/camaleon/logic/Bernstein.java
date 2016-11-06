@@ -22,9 +22,17 @@ import java.util.LinkedList;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
+/**
+ * Algoritmo de Síntesis de Bernstein
+ * @author Lizeth Valbuena, Alexander Lozano
+ */
 public class Bernstein {
-
+/**
+ * Obtiene las particiones con base a un universo discurso compuesto de dependencias funcionales y atributos
+ * @param attributes Lista de atributos
+ * @param dependencies Lista de dependencias funcionales
+ * @return 
+ */
     public static TreeMap<String, HashSet<String>> getPartitions(HashSet<String> attributes, List<FuncDependency> dependencies) {
         TreeMap<String, HashSet<String>> partitions = new TreeMap<String, HashSet<String>>();
         for (int i = 0; i < dependencies.size(); i++) {
@@ -110,7 +118,12 @@ public class Bernstein {
         Collections.sort(cleanPartitions, Util.hashSetComparator);
         return cleanPartitions;
     }
-
+/**
+ * Automatización del procedimiento establecido del algoritmo de Síntesis de Bernstein
+ * @param attributes Lista de atributos
+ * @param dependencies Lista de dependencias funcionales
+ * @return 
+ */
     public static List<Relation> getBernstein(HashSet<String> attributes, List<FuncDependency> dependencies) {
         List<Relation> proyecciones = new ArrayList<Relation>();
         TreeMap<String, HashSet<String>> partitions = Bernstein.getPartitions(attributes, dependencies);
