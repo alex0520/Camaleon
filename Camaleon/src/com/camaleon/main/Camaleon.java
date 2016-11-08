@@ -28,7 +28,7 @@ public class Camaleon {
      */
     public static void main(String[] args) {
 
-        LoadFileResult loadFileResult = LoadFile.loadFile("C:/Users/Alexander Lozano/Downloads/juan.json");
+        LoadFileResult loadFileResult = LoadFile.loadFile("C:/Users/ASUS/Downloads/proyeccion.json");
 
         if (loadFileResult.getStatus().equals(LoadFileResult.Status.SUCCESS)) {
             Relation relacion = loadFileResult.getRelation();

@@ -1,46 +1,23 @@
 package com.camaleon.logic.proyeccion;
 
+import com.google.common.collect.Sets;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Conjunto {
 
     public static Set<String> diferenciaConjuntos(Set<String> atributosT, Set<String> atributosY) {
-        Set<String> atributosZ = new HashSet<>(atributosT);
-        for (String atributo : atributosY) {
-            atributosZ.remove(atributo);
-        }
-        return atributosZ;
+        return Sets.difference(atributosT, atributosY);
     }
 
     public static Set<String> unirConjuntos(Set<String> conjuntoA, Set<String> conjuntoB) {
-        if (conjuntoA.isEmpty()) {
-            return new HashSet<>(conjuntoB);
-        }
-        if (conjuntoB.isEmpty()) {
-            return new HashSet<>(conjuntoA);
-        }
-        Set<String> union = new HashSet<>(conjuntoA);
-        union.addAll(conjuntoB);
-
-        return union;
-
+        return Sets.union(conjuntoA, conjuntoB);
     }
 
     public static Set<Dependencia> diferenciaConjuntoDep(Set<Dependencia> A, Set<Dependencia> B) {
-        Set<Dependencia> subA = new HashSet<>(A);
-        Set<Dependencia> subB = new HashSet<>(B);
-        for (Dependencia dependenciaA : A) {
-            for (Dependencia dependenciaB : B) {
-                if (dependenciaA.equals(dependenciaB)) {
-                    subA.remove(dependenciaA);
-                    subB.remove(dependenciaA);
-                }
-            }
-        }
-        subA.addAll(subB);
-        return subA;
+        return Sets.difference(Sets.union(A, B), Sets.intersection(A, B));
     }
 
     /**
@@ -50,13 +27,7 @@ public class Conjunto {
      * @return
      */
     public static Set<Dependencia> retirarDependeciasTriviales(Set<Dependencia> conjuntoDependencias) {
-        Set<Dependencia> dependenciaSinTriviales = new LinkedHashSet<>();
-        for (Dependencia dependencia : conjuntoDependencias) {
-            if (!dependencia.esDependenciaTrivial()) {
-                dependenciaSinTriviales.add(dependencia);
-            }
-        }
-        return dependenciaSinTriviales;
+        return conjuntoDependencias.stream().filter(dep -> !dep.esDependenciaTrivial()).collect(Collectors.toSet());        
     }
 
     public static Set<Dependencia> quitarAttrDependencias(Set<Dependencia> dependencias, String atributo) {
@@ -72,14 +43,10 @@ public class Conjunto {
             nDependencia = Conjunto.retirarDependeciasTriviales(nDependencia);
             Set<Dependencia> implicados = new HashSet<>();
             Set<Dependencia> implicantes = new HashSet<>();
-            for (Dependencia dependencia : nDependencia) {
-                if (dependencia.getImplicados().contains(atributo)) {
-                    implicados.add(dependencia);
-                }
-                if (dependencia.getImplicantes().contains(atributo)) {
-                    implicantes.add(dependencia);
-                }
-            }
+            
+            implicantes = nDependencia.stream().filter(dep -> dep.getImplicantes().contains(atributo)).collect(Collectors.toSet());
+            implicados = nDependencia.stream().filter(dep -> dep.getImplicados().contains(atributo)).collect(Collectors.toSet());
+            
             if (!implicados.isEmpty() && !implicantes.isEmpty()) {
                 Set<String> nImplicado;
                 for (Dependencia implicado : implicados) {

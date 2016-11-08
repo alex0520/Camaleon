@@ -50,14 +50,7 @@ public class Dependencia {
      * @return
      */
     public boolean esDependenciaTrivial() {
-        if (implicados.equals(implicantes)) {
-            return true;
-        } else {
-            return (Conjunto.diferenciaConjuntos(implicantes, implicados).isEmpty()
-                    || Conjunto.diferenciaConjuntos(implicados, implicantes).isEmpty());
-
-        }
-
+        return implicantes.containsAll(implicados);
     }
 
     public static Set<Dependencia> proyectarDependencia(Dependencia dependencia) {
@@ -80,24 +73,6 @@ public class Dependencia {
         if (dep == null)
             return false;
         return this.implicantes.equals(dep.implicantes) && this.implicados.equals(dep.implicados);
-    }
-
-    public Dependencia clonar() {
-
-        return new Dependencia(new LinkedHashSet<>(this.implicantes), new LinkedHashSet<>(this.implicados));
-
-    }
-
-    public void adicionarImplicante(String implicante) {
-        implicantes.add(implicante);
-    }
-
-    public void adicionarImplicado(String implicado) {
-        implicados.add(implicado);
-    }
-
-    public boolean contieneAtributo(String atributo) {
-        return implicados.contains(atributo) || implicantes.contains(atributo);
     }
 
 }

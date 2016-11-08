@@ -8,6 +8,7 @@ package com.camaleon.logic.proyeccion;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -48,14 +49,7 @@ public class Proyeccion {
     }
 
     private Set<Dependencia> obtenerDepSegunAttr(Set<String> A, Set<Dependencia> G) {
-        Set<Dependencia> H = new HashSet<>();
-        for (Dependencia dependencia : G) {
-            if (dependencia.getImplicados().contains(A.toArray(new String[A.size()])[0])
-                    || dependencia.getImplicantes().contains(A.toArray(new String[A.size()])[0])) {
-                H.add(dependencia);
-            }
-        }
-        return H;
+        return G.stream().filter(dep -> dep.getImplicados().containsAll(A)|| dep.getImplicantes().containsAll(A)).collect(Collectors.toSet());
     }
 
 }
