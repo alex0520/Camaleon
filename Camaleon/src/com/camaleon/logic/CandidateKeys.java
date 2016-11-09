@@ -11,7 +11,6 @@ import java.util.Set;
 import com.camaleon.entities.FuncDependency;
 import com.camaleon.entities.Relation;
 import com.google.common.base.Function;
-import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Sets;
@@ -28,27 +27,27 @@ public class CandidateKeys {
      * @return 
      */
     public static List<HashSet<String>> candidateKeys(Relation relation,
-            HashMap<HashSet<String>, HashSet<String>> closures) {
+            HashMap<Set<String>, Set<String>> closures) {
         List<HashSet<String>> candidateKeys = new ArrayList<HashSet<String>>();
-        Function<FuncDependency, HashSet<String>> impliedFunction = new Function<FuncDependency, HashSet<String>>() {
+        Function<FuncDependency, Set<String>> impliedFunction = new Function<FuncDependency, Set<String>>() {
             @Override
-            public HashSet<String> apply(FuncDependency input) {
-                return input.getImplied();
+            public Set<String> apply(FuncDependency input) {
+                return input.getImpliedKeys();
             }
         };
 
-        Function<FuncDependency, HashSet<String>> implicantFunction = new Function<FuncDependency, HashSet<String>>() {
+        Function<FuncDependency, Set<String>> implicantFunction = new Function<FuncDependency, Set<String>>() {
             @Override
-            public HashSet<String> apply(FuncDependency input) {
-                return input.getImplicant();
+            public Set<String> apply(FuncDependency input) {
+                return input.getImplicantKeys();
             }
         };
 
-        Set<HashSet<String>> implicant = new HashSet<HashSet<String>>(
+        Set<Set<String>> implicant = new HashSet<Set<String>>(
                 Collections2.transform(relation.getDependencies(),
                         implicantFunction));
 
-        Set<HashSet<String>> implied = new HashSet<HashSet<String>>(
+        Set<Set<String>> implied = new HashSet<Set<String>>(
                 Collections2.transform(relation.getDependencies(),
                         impliedFunction));
 
@@ -59,33 +58,33 @@ public class CandidateKeys {
         HashSet<String> impliedHashSet = new HashSet<String>();
         HashSet<String> implicantHashSet = new HashSet<String>();
 
-        for (HashSet<String> hashSet : implied) {
+        for (Set<String> hashSet : implied) {
             impliedHashSet.addAll(hashSet);
         }
 
-        for (HashSet<String> hashSet : implicant) {
+        for (Set<String> hashSet : implicant) {
             implicantHashSet.addAll(hashSet);
         }
 
-        SetView<String> yesSet = Sets.difference(relation.getAttributes(),
+        SetView<String> yesSet = Sets.difference(relation.getAttributeKeys(),
                 impliedHashSet);
-        SetView<String> noSet = Sets.difference(relation.getAttributes(),
+        SetView<String> noSet = Sets.difference(relation.getAttributeKeys(),
                 implicantHashSet);
         noHashSet = new HashSet<String>(noSet);
 
         if (yesSet.size() > 0) {
             yesHashSet = new HashSet<String>(yesSet);
-            HashSet<String> closureYesSet = Util.closure(yesHashSet,
+            Set<String> closureYesSet = Util.closure(yesHashSet,
                     relation.getDependencies(), closures);
             if (closureYesSet.size() == relation.getAttributes().size()) {
                 candidateKeys.add(yesHashSet);
                 return candidateKeys;
             }
             SetView<String> maybeSet = Sets.difference(
-                    relation.getAttributes(), yesHashSet);
+                    relation.getAttributeKeys(), yesHashSet);
             maybeHashSet = new HashSet<String>(maybeSet);
         } else {
-            maybeHashSet = new HashSet<String>(relation.getAttributes());
+            maybeHashSet = new HashSet<String>(relation.getAttributeKeys());
         }
 
         if (noHashSet.size() > 0 && noHashSet.size() < attrSize) {
@@ -110,7 +109,7 @@ public class CandidateKeys {
             if (yesHashSet.size() > 0) {
                 tempTrySet.addAll(yesHashSet);
             }
-            HashSet<String> closure = Util.closure(tempTrySet,
+            Set<String> closure = Util.closure(tempTrySet,
                     relation.getDependencies(), closures);
             if (closure.size() == attrSize) {
                 candidateKeys.add(tempTrySet);

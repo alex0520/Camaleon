@@ -6,6 +6,7 @@
 package com.camaleon.view;
 
 import com.camaleon.entities.Attribute;
+import com.camaleon.entities.AttributeDataType;
 import com.camaleon.entities.Table;
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -231,9 +232,9 @@ public class Script extends javax.swing.JFrame {
         List<Attribute> attributes = table.getAttributes();
         int attrSelected = selAtributo.getSelectedIndex();
         Attribute attribute = attributes.get(attrSelected);
-        JDBCType type = (JDBCType) selTipo.getSelectedItem();
+        //JDBCType type = (JDBCType) selTipo.getSelectedItem();
         
-        tables.stream().forEach(t -> t.getAttributes().stream().filter(a -> a.getName().equals(attribute.getName())).forEach(a -> a.setType(type)));
+        tables.stream().forEach(t -> t.getAttributes().stream().filter(a -> a.getName().equals(attribute.getName())).forEach(a -> a.setType(AttributeDataType.VARCHAR)));
         
         rePaintSelAttribute(dCBMAtributos);
         

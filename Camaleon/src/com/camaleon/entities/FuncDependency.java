@@ -1,53 +1,59 @@
 package com.camaleon.entities;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 /**
  * 
  * @author Lizeth Valbuena, Alexander Lozano
  */
 public class FuncDependency implements Comparable<FuncDependency> {
 
-    private HashSet<String> implicant;
-    private HashSet<String> implied;
+    private Map<String, Attribute> implicant;
+    private Map<String, Attribute> implied;
 
     
     public FuncDependency() {
         super();
-        this.implicant = new HashSet<String>();
-        this.implied = new HashSet<String>();
+        this.implicant = new HashMap<>();
+        this.implied = new HashMap<>();
     }
     /**
      * 
      * @param implicant Dato de tipo HashSet para el implicante
      * @param implied Dato de tipo HashSet para el implicado
      */
-    public FuncDependency(HashSet<String> implicant, HashSet<String> implied) {
+    public FuncDependency(Map<String, Attribute> implicant, Map<String, Attribute> implied) {
         super();
         this.implicant = implicant;
         this.implied = implied;
     }
 
-    public HashSet<String> getImplicant() {
+    public Map<String, Attribute> getImplicant() {
         return implicant;
     }
 
-    public void setImplicant(HashSet<String> implicant) {
+    public void setImplicant(Map<String, Attribute> implicant) {
         this.implicant = implicant;
     }
 
-    public HashSet<String> getImplied() {
+    public Map<String, Attribute> getImplied() {
         return implied;
     }
 
-    public void setImplied(HashSet<String> implied) {
+    public void setImplied(Map<String, Attribute> implied) {
         this.implied = implied;
     }
+    
+    public Set<String> getImplicantKeys(){
+        return implicant.keySet();
+    }
+    
+    public Set<String> getImpliedKeys(){
+        return implied.keySet();
+    }
 
-//	@Override
-//	public String toString() {
-//		return "FuncDependency [implicant=" + implicant + ", implied="
-//				+ implied + "]";
-//	}
     @Override
     public String toString() {
         return "[" + implicant + " -> "

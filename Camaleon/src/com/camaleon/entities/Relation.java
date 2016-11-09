@@ -1,35 +1,39 @@
 package com.camaleon.entities;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 /**
- * 
+ *
  * @author Lizeth Valbuena, Alexander Lozano
  */
 public class Relation {
 
-    private HashSet<String> attributes;
+    private Map<String, Attribute> attributes;
     private List<FuncDependency> dependencies;
 
     public Relation() {
         super();
-        this.attributes = new HashSet<String>();
-        this.dependencies = new ArrayList<FuncDependency>();
+        this.attributes = new HashMap<>();
+        this.dependencies = new ArrayList<>();
     }
 
-    public Relation(HashSet<String> attributes,
-            ArrayList<FuncDependency> dependencies) {
+    public Relation(Map<String, Attribute> attributes,
+            List<FuncDependency> dependencies) {
         super();
         this.attributes = attributes;
         this.dependencies = dependencies;
     }
 
-    public HashSet<String> getAttributes() {
+    public Map<String, Attribute> getAttributes() {
         return attributes;
     }
 
-    public void setAttributes(HashSet<String> attributes) {
+    public void setAttributes(Map<String, Attribute> attributes) {
         this.attributes = attributes;
     }
 
@@ -46,11 +50,21 @@ public class Relation {
         return "Relation [attributes=" + attributes + ", dependencies="
                 + dependencies + "]";
     }
-/**
- * 
- * @param oldValue Valor Actual de un atributo
- * @param newValue Nuevo Valor del atributo
- */
+    
+    public Set<String> getAttributeKeys(){
+        return attributes.keySet();
+    }
+
+    public Set<String> getAttribute() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    /**
+     *
+     * @param oldValue Valor Actual de un atributo
+     * @param newValue Nuevo Valor del atributo
+     */
+    /*
     public void editAttr(String oldValue, String newValue) {
         this.attributes.remove(oldValue);
         this.attributes.add(newValue);
@@ -72,11 +86,14 @@ public class Relation {
                 this.dependencies.add(i, funcDep);
             }
         }
-    }
+    }*/
+
     /**
-     * 
-     * @param oldValue Valor del atributo anterior 
+     *
+     * @param oldValue Valor del atributo anterior
      */
+    
+    /*
     public void delAttr(String oldValue) {
         this.attributes.remove(oldValue);
         for (int i = 0; i < this.dependencies.size(); i++) {
@@ -110,6 +127,6 @@ public class Relation {
                 this.dependencies.add(i, funcDep);
             }
         }
-    }
+    }*/
 
 }

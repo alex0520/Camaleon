@@ -3,21 +3,15 @@ package com.camaleon.logic;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 
 import com.camaleon.entities.FuncDependency;
 import com.camaleon.entities.Relation;
 import com.camaleon.logic.proyeccion.Dependencia;
-import com.camaleon.logic.proyeccion.Proyeccion;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.function.Function;
@@ -33,50 +27,50 @@ public class Bernstein {
  * @param dependencies Lista de dependencias funcionales
  * @return 
  */
-    public static TreeMap<String, HashSet<String>> getPartitions(HashSet<String> attributes, List<FuncDependency> dependencies) {
+    public static TreeMap<String, HashSet<String>> getPartitions(Set<String> attributes, List<FuncDependency> dependencies) {
         TreeMap<String, HashSet<String>> partitions = new TreeMap<String, HashSet<String>>();
         for (int i = 0; i < dependencies.size(); i++) {
-            String key = Joiner.on("").join(dependencies.get(i).getImplicant());
+            String key = Joiner.on("").join(dependencies.get(i).getImplicantKeys());
             if (partitions.containsKey(key)) {
-                partitions.get(key).addAll(dependencies.get(i).getImplied());
+                partitions.get(key).addAll(dependencies.get(i).getImpliedKeys());
             } else {
                 HashSet<String> values = new HashSet<>();
-                values.addAll(dependencies.get(i).getImplicant());
-                values.addAll(dependencies.get(i).getImplied());
+                values.addAll(dependencies.get(i).getImplicantKeys());
+                values.addAll(dependencies.get(i).getImpliedKeys());
                 partitions.put(key, values);
             }
         }
 
-        com.google.common.base.Function<FuncDependency, HashSet<String>> impliedFunction = new com.google.common.base.Function<FuncDependency, HashSet<String>>() {
+        com.google.common.base.Function<FuncDependency, Set<String>> impliedFunction = new com.google.common.base.Function<FuncDependency, Set<String>>() {
             @Override
-            public HashSet<String> apply(FuncDependency input) {
-                return input.getImplied();
+            public Set<String> apply(FuncDependency input) {
+                return input.getImpliedKeys();
             }
         };
 
-        com.google.common.base.Function<FuncDependency, HashSet<String>> implicantFunction = new com.google.common.base.Function<FuncDependency, HashSet<String>>() {
+        com.google.common.base.Function<FuncDependency, Set<String>> implicantFunction = new com.google.common.base.Function<FuncDependency, Set<String>>() {
             @Override
-            public HashSet<String> apply(FuncDependency input) {
-                return input.getImplicant();
+            public Set<String> apply(FuncDependency input) {
+                return input.getImplicantKeys();
             }
         };
 
-        Set<HashSet<String>> implicant = new HashSet<HashSet<String>>(
+        Set<Set<String>> implicant = new HashSet<Set<String>>(
                 Collections2.transform(dependencies,
                         implicantFunction));
 
-        Set<HashSet<String>> implied = new HashSet<HashSet<String>>(
+        Set<Set<String>> implied = new HashSet<Set<String>>(
                 Collections2.transform(dependencies,
                         impliedFunction));
 
         HashSet<String> implicantNew = new HashSet<String>();
         HashSet<String> impliedNew = new HashSet<String>();
 
-        for (HashSet<String> hashSet : implied) {
+        for (Set<String> hashSet : implied) {
             implicantNew.addAll(hashSet);
         }
 
-        for (HashSet<String> hashSet : implicant) {
+        for (Set<String> hashSet : implicant) {
             impliedNew.addAll(hashSet);
         }
 
@@ -124,19 +118,20 @@ public class Bernstein {
  * @param dependencies Lista de dependencias funcionales
  * @return 
  */
-    public static List<Relation> getBernstein(HashSet<String> attributes, List<FuncDependency> dependencies) {
+    public static List<Relation> getBernstein(Set<String> attributes, List<FuncDependency> dependencies) {
         List<Relation> proyecciones = new ArrayList<Relation>();
         TreeMap<String, HashSet<String>> partitions = Bernstein.getPartitions(attributes, dependencies);
         List<HashSet<String>> cleanPartitions = Bernstein.remDupPartitions(partitions);
         Function<FuncDependency, Dependencia> convertFromFuncDepToDep = new Function<FuncDependency, Dependencia>() {
             public Dependencia apply(FuncDependency t) {
-                Dependencia d = new Dependencia(t.getImplicant(), t.getImplied());
+                Dependencia d = new Dependencia(t.getImplicantKeys(), t.getImpliedKeys());
                 return d;
             }
         };
 
         Set<Dependencia> dependencias = dependencies.stream().map(convertFromFuncDepToDep).collect(Collectors.<Dependencia>toSet());
 
+        /*
         Function<Dependencia, FuncDependency> convertFromDepToFuncDep = new Function<Dependencia, FuncDependency>() {
             public FuncDependency apply(Dependencia t) {
                 FuncDependency f = new FuncDependency(new HashSet<String>(t.getImplicantes()), new HashSet<String>(t.getImplicados()));
@@ -153,7 +148,7 @@ public class Bernstein {
             List<FuncDependency> proyDepList = proyDependencies.stream().map(convertFromDepToFuncDep).collect(Collectors.<FuncDependency>toList());
             relation.setDependencies(proyDepList);
             proyecciones.add(relation);
-        }
+        }*/
         return proyecciones;
     }
 }

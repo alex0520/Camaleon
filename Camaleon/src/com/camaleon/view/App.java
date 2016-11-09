@@ -5,6 +5,7 @@
  */
 package com.camaleon.view;
 
+import com.camaleon.entities.Attribute;
 import com.camaleon.entities.FuncDependency;
 import com.camaleon.entities.LoadFileResult;
 import com.camaleon.entities.Relation;
@@ -27,6 +28,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -45,7 +47,7 @@ public class App extends javax.swing.JFrame {
     TreeMap<String, HashSet<String>> partitions = new TreeMap<String, HashSet<String>>();
     List<HashSet<String>> cleanPartitions = new ArrayList<HashSet<String>>();
     List<HashSet<String>> keys = new ArrayList<HashSet<String>>();
-    HashMap<HashSet<String>, HashSet<String>> closures = new HashMap<HashSet<String>, HashSet<String>>();
+    HashMap<Set<String>, Set<String>> closures = new HashMap<Set<String>, Set<String>>();
     TreeSetListModel<String> tslmAtributos = new TreeSetListModel<String>(String.CASE_INSENSITIVE_ORDER);
     TreeSetListModel<FuncDependency> tslmDepFuncionales = new TreeSetListModel<FuncDependency>();
     DefaultListModel<Table> dlmSintesis = new DefaultListModel<Table>();
@@ -340,7 +342,7 @@ public class App extends javax.swing.JFrame {
             LoadFileResult loadFileResult = LoadFile.loadFile(path);
             if (loadFileResult.getStatus().equals(LoadFileResult.Status.SUCCESS)) {
                 relation = loadFileResult.getRelation();
-                for (Iterator<String> iterator = relation.getAttributes().iterator(); iterator.hasNext();) {
+                for (Iterator<String> iterator = relation.getAttributeKeys().iterator(); iterator.hasNext();) {
                     tslmAtributos.add(iterator.next());
                 }
                 for (Iterator<FuncDependency> iterator = relation.getDependencies().iterator(); iterator.hasNext();) {
@@ -377,7 +379,7 @@ public class App extends javax.swing.JFrame {
                 JOptionPane.QUESTION_MESSAGE
         );
         if (attr != null) {
-            relation.getAttributes().add(attr);
+            relation.getAttributes().put(attr, new Attribute(attr,attr));
             tslmAtributos.add(attr);
             if (tslmAtributos.getSize() > 1) {
                 jtpVista.setEnabledAt(1, true);
@@ -400,13 +402,13 @@ public class App extends javax.swing.JFrame {
     private void btnEditAtrActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditAtrActionPerformed
         int selected = jlAtributos.getSelectedIndex();
         if (selected > -1) {
-            List<String> attributes = new ArrayList<String>(relation.getAttributes());
+            List<String> attributes = new ArrayList<String>(relation.getAttributeKeys());
             String attr = attributes.get(selected);
             String newAttr = (String) JOptionPane.showInputDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Ingrese el nombre del atributo", "Editar atributo", JOptionPane.OK_CANCEL_OPTION, null, null, attr);
             if (newAttr != null && !newAttr.equals("")) {
                 attributes.remove(selected);
                 attributes.add(selected, newAttr);
-                relation.editAttr(attr, newAttr);
+                //relation.editAttr(attr, newAttr);
                 tslmAtributos.remove(attr);
                 tslmAtributos.add(newAttr);
                 rePaintDepFunc(tslmDepFuncionales);
@@ -420,7 +422,7 @@ public class App extends javax.swing.JFrame {
             int confirm = JOptionPane.showConfirmDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Está seguro de eliminar el atributo: " + jlAtributos.getSelectedValue(), "Confirmar", JOptionPane.OK_CANCEL_OPTION);
             if (confirm == JOptionPane.OK_OPTION) {
                 String attr = jlAtributos.getSelectedValue();
-                relation.delAttr(attr);
+                //relation.delAttr(attr);
                 tslmAtributos.remove(attr);
                 rePaintDepFunc(tslmDepFuncionales);
                 dlmSintesis.clear();
@@ -429,7 +431,7 @@ public class App extends javax.swing.JFrame {
     }//GEN-LAST:event_btnDelAtrActionPerformed
 
     private void btnAddDepFuncActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddDepFuncActionPerformed
-        FuncDependencyForm funcDependencyForm = new FuncDependencyForm(this, new FuncDependency(), relation.getAttributes());
+        FuncDependencyForm funcDependencyForm = new FuncDependencyForm(this, new FuncDependency(), relation.getAttributeKeys());
         funcDependencyForm.setVisible(true);
         dlmSintesis.clear();
     }//GEN-LAST:event_btnAddDepFuncActionPerformed
@@ -437,7 +439,7 @@ public class App extends javax.swing.JFrame {
     private void btnEditDepFuncActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditDepFuncActionPerformed
         if (jlDepFuncionales.getSelectedIndex() > -1) {
             FuncDependency funcDep = jlDepFuncionales.getSelectedValue();
-            FuncDependencyForm funcDependencyForm = new FuncDependencyForm(this, funcDep, relation.getAttributes());
+            FuncDependencyForm funcDependencyForm = new FuncDependencyForm(this, funcDep, relation.getAttributeKeys());
             funcDependencyForm.setVisible(true);
             dlmSintesis.clear();
         }
@@ -477,15 +479,15 @@ public class App extends javax.swing.JFrame {
 
             Function<FuncDependency, DependenciaFuncional> convertFromFuncDepToDepFunc = new Function<FuncDependency, DependenciaFuncional>() {
                 public DependenciaFuncional apply(FuncDependency t) {
-                    List<Atribute> implicante = t.getImplicant().stream().map(convertFromStringToAtribute).collect(Collectors.<Atribute>toList());
-                    List<Atribute> implicado = t.getImplied().stream().map(convertFromStringToAtribute).collect(Collectors.<Atribute>toList());
+                    List<Atribute> implicante = t.getImplicantKeys().stream().map(convertFromStringToAtribute).collect(Collectors.<Atribute>toList());
+                    List<Atribute> implicado = t.getImpliedKeys().stream().map(convertFromStringToAtribute).collect(Collectors.<Atribute>toList());
                     DependenciaFuncional f = new DependenciaFuncional(implicante, implicado);
                     return f;
                 }
             };
 
             List<DependenciaFuncional> dependencias = relation.getDependencies().stream().map(convertFromFuncDepToDepFunc).collect(Collectors.<DependenciaFuncional>toList());
-            List<Atribute> atributos = relation.getAttributes().stream().map(convertFromStringToAtribute).collect(Collectors.<Atribute>toList());
+            List<Atribute> atributos = relation.getAttributeKeys().stream().map(convertFromStringToAtribute).collect(Collectors.<Atribute>toList());
             List<List<Atribute>> keysList = new ArrayList<>();
             for (Iterator<HashSet<String>> iterator = keys.iterator(); iterator.hasNext();) {
                 HashSet<String> key = iterator.next();
@@ -520,15 +522,15 @@ public class App extends javax.swing.JFrame {
 
             Function<FuncDependency, DependenciaFuncional> convertFromFuncDepToDepFunc = new Function<FuncDependency, DependenciaFuncional>() {
                 public DependenciaFuncional apply(FuncDependency t) {
-                    List<Atribute> implicante = t.getImplicant().stream().map(convertFromStringToAtribute).collect(Collectors.<Atribute>toList());
-                    List<Atribute> implicado = t.getImplied().stream().map(convertFromStringToAtribute).collect(Collectors.<Atribute>toList());
+                    List<Atribute> implicante = t.getImplicantKeys().stream().map(convertFromStringToAtribute).collect(Collectors.<Atribute>toList());
+                    List<Atribute> implicado = t.getImpliedKeys().stream().map(convertFromStringToAtribute).collect(Collectors.<Atribute>toList());
                     DependenciaFuncional f = new DependenciaFuncional(implicante, implicado);
                     return f;
                 }
             };
 
             List<DependenciaFuncional> dependencias = relation.getDependencies().stream().map(convertFromFuncDepToDepFunc).collect(Collectors.<DependenciaFuncional>toList());
-            List<Atribute> atributos = relation.getAttributes().stream().map(convertFromStringToAtribute).collect(Collectors.<Atribute>toList());
+            List<Atribute> atributos = relation.getAttributeKeys().stream().map(convertFromStringToAtribute).collect(Collectors.<Atribute>toList());
             List<List<Atribute>> keysList = new ArrayList<>();
             for (Iterator<HashSet<String>> iterator = keys.iterator(); iterator.hasNext();) {
                 HashSet<String> key = iterator.next();
@@ -557,12 +559,12 @@ public class App extends javax.swing.JFrame {
             relation.setDependencies(MinimalCover.rightDecomposition(relation
                     .getDependencies()));
             relation.setDependencies(MinimalCover.removeStrangeElemLeft(
-                    relation.getDependencies(), closures));
+                    relation, closures));
             relation.setDependencies(MinimalCover.removeRedundantDependencies(
                     relation.getDependencies()));
             keys = CandidateKeys.candidateKeys(relation,
                     closures);
-            List<Relation> bernstein = Bernstein.getBernstein(relation.getAttributes(), relation.getDependencies());
+            List<Relation> bernstein = Bernstein.getBernstein(relation.getAttributeKeys(), relation.getDependencies());
             dlmSintesis.clear();
             for (int i = 0; i < bernstein.size(); i++) {
                 Table table = relationTableConverter.convert(bernstein.get(i));

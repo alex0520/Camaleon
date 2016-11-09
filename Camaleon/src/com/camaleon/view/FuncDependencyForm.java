@@ -14,6 +14,7 @@ import java.awt.Toolkit;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import javax.swing.JOptionPane;
 
 /**
@@ -32,7 +33,7 @@ public class FuncDependencyForm extends javax.swing.JFrame {
     /**
      * Creates new form FuncDependencyForm
      */
-    public FuncDependencyForm(javax.swing.JFrame parent, FuncDependency funcDep, HashSet<String> attributes) {
+    public FuncDependencyForm(javax.swing.JFrame parent, FuncDependency funcDep, Set<String> attributes) {
         
         this.funcDep = funcDep;
         padre = (App) parent;
@@ -48,8 +49,8 @@ public class FuncDependencyForm extends javax.swing.JFrame {
         jlAttrImplied.setModel(tslmAttrNotImplied);
         jlAttrImpliedSel.setModel(tslmAttrImplied);
         
-        HashSet<String> implicant = funcDep.getImplicant();
-        HashSet<String> implied = funcDep.getImplied();
+        Set<String> implicant = funcDep.getImplicantKeys();
+        Set<String> implied = funcDep.getImpliedKeys();
         
         HashSet<String> notImplicant = new HashSet<String>(Sets.difference(attributes, implicant));
         HashSet<String> notImplied = new HashSet<String>(Sets.difference(attributes, implied));
@@ -338,8 +339,8 @@ public class FuncDependencyForm extends javax.swing.JFrame {
     private void btnAceptarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAceptarActionPerformed
         if (tslmAttrImplicant.getSize() > 0 && tslmAttrImplied.getSize() > 0) {
             FuncDependency funcDependency = new FuncDependency();
-            funcDependency.setImplicant(tslmAttrImplicant.getAllElements());
-            funcDependency.setImplied(tslmAttrImplied.getAllElements());
+            /*funcDependency.setImplicant(tslmAttrImplicant.getAllElements());
+            funcDependency.setImplied(tslmAttrImplied.getAllElements());*/
             this.dispose();
             if (funcDep.getImplicant().isEmpty()) {
                 padre.addFuncDependency(funcDependency);

@@ -14,14 +14,15 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
 import java.util.Comparator;
+import java.util.Map;
 
 public class Util {
 
-    public static HashSet<String> closure(HashSet<String> attributes, List<FuncDependency> dependencies,
-            HashMap<HashSet<String>, HashSet<String>> closures) {
+    public static Set<String> closure(Set<String> attributes, List<FuncDependency> dependencies,
+            Map<Set<String>, Set<String>> closures) {
 
         if (closures == null) {
-            closures = new HashMap<HashSet<String>, HashSet<String>>();
+            closures = new HashMap<Set<String>, Set<String>>();
         }
 
         if (!closures.containsKey(attributes)) {
@@ -29,14 +30,14 @@ public class Util {
             HashSet<String> closureNew = new HashSet<String>();
             closureNew.addAll(attributes);
 
-            Function<FuncDependency, HashSet<String>> function = new Function<FuncDependency, HashSet<String>>() {
+            Function<FuncDependency, Set<String>> function = new Function<FuncDependency, Set<String>>() {
                 @Override
-                public HashSet<String> apply(FuncDependency input) {
-                    return input.getImplicant();
+                public Set<String> apply(FuncDependency input) {
+                    return input.getImplicantKeys();
                 }
             };
 
-            Set<HashSet<String>> implicants = new HashSet<HashSet<String>>(
+            Set<Set<String>> implicants = new HashSet<Set<String>>(
                     Collections2.transform(dependencies, function));
 
             do {
@@ -44,13 +45,13 @@ public class Util {
                 if (!closures.containsKey(closure)) {
                     Set<Set<String>> powerSet = Sets.powerSet(closure);
 
-                    final SetView<HashSet<String>> intersection = Sets.intersection(implicants, powerSet);
+                    final SetView<Set<String>> intersection = Sets.intersection(implicants, powerSet);
 
                     Predicate<FuncDependency> crossDependencies = new Predicate<FuncDependency>() {
                         @Override
                         public boolean apply(FuncDependency dependency) {
-                            HashSet<String> implicant = dependency.getImplicant();
-                            for (HashSet<String> hashSet : intersection) {
+                            Set<String> implicant = dependency.getImplicantKeys();
+                            for (Set<String> hashSet : intersection) {
                                 if (hashSet.containsAll(implicant)) {
                                     return true;
                                 }
@@ -63,7 +64,7 @@ public class Util {
                             Collections2.filter(dependencies, crossDependencies));
 
                     for (FuncDependency funcDependency : crossDep) {
-                        closureNew.addAll(funcDependency.getImplied());
+                        closureNew.addAll(funcDependency.getImpliedKeys());
                     }
                 } else {
                     closureNew.addAll(closures.get(closure));

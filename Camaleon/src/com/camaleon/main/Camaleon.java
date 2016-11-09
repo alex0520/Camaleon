@@ -17,6 +17,7 @@ import com.camaleon.logic.segterformanormal.DependenciaFuncional;
 import com.camaleon.logic.segterformanormal.NormalForm;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -28,12 +29,12 @@ public class Camaleon {
      */
     public static void main(String[] args) {
 
-        LoadFileResult loadFileResult = LoadFile.loadFile("C:/Users/ASUS/Downloads/proyeccion.json");
+        LoadFileResult loadFileResult = LoadFile.loadFile("C:/Users/ASUS/Downloads/test_attr.json");
 
         if (loadFileResult.getStatus().equals(LoadFileResult.Status.SUCCESS)) {
             Relation relacion = loadFileResult.getRelation();
 
-            HashMap<HashSet<String>, HashSet<String>> closures = new HashMap<HashSet<String>, HashSet<String>>();
+            HashMap<Set<String>, Set<String>> closures = new HashMap<Set<String>, Set<String>>();
 
             System.out.println("L: " + relacion);
 
@@ -43,7 +44,7 @@ public class Camaleon {
             System.out.println("L0: " + relacion);
 
             relacion.setDependencies(MinimalCover.removeStrangeElemLeft(
-                    relacion.getDependencies(), closures));
+                    relacion, closures));
 
             System.out.println("L1: " + relacion);
 
@@ -57,7 +58,7 @@ public class Camaleon {
 
             System.out.println("LLaves Candidatas: " + keys);
 
-            List<Relation> bernstein = Bernstein.getBernstein(relacion.getAttributes(), relacion.getDependencies());
+            List<Relation> bernstein = Bernstein.getBernstein(relacion.getAttributeKeys(), relacion.getDependencies());
             System.out.println("Bernstein:" + bernstein);
 
             Function<String, Atribute> convertFromStringToAtribute = new Function<String, Atribute>() {
@@ -69,15 +70,15 @@ public class Camaleon {
 
             Function<FuncDependency, DependenciaFuncional> convertFromFuncDepToDepFunc = new Function<FuncDependency, DependenciaFuncional>() {
                 public DependenciaFuncional apply(FuncDependency t) {
-                    List<Atribute> implicante = t.getImplicant().stream().map(convertFromStringToAtribute).collect(Collectors.<Atribute>toList());
-                    List<Atribute> implicado = t.getImplied().stream().map(convertFromStringToAtribute).collect(Collectors.<Atribute>toList());
+                    List<Atribute> implicante = t.getImplicantKeys().stream().map(convertFromStringToAtribute).collect(Collectors.<Atribute>toList());
+                    List<Atribute> implicado = t.getImpliedKeys().stream().map(convertFromStringToAtribute).collect(Collectors.<Atribute>toList());
                     DependenciaFuncional f = new DependenciaFuncional(implicante, implicado);
                     return f;
                 }
             };
 
             List<DependenciaFuncional> dependencias = relacion.getDependencies().stream().map(convertFromFuncDepToDepFunc).collect(Collectors.<DependenciaFuncional>toList());
-            List<Atribute> atributos = relacion.getAttributes().stream().map(convertFromStringToAtribute).collect(Collectors.<Atribute>toList());
+            List<Atribute> atributos = relacion.getAttributeKeys().stream().map(convertFromStringToAtribute).collect(Collectors.<Atribute>toList());
             List<List<Atribute>> keysList = new ArrayList<>();
             for (Iterator<HashSet<String>> iterator = keys.iterator(); iterator.hasNext();) {
                 HashSet<String> key = iterator.next();

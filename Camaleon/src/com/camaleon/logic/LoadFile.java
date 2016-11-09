@@ -1,5 +1,7 @@
 package com.camaleon.logic;
 
+import com.camaleon.entities.Attribute;
+import com.camaleon.entities.AttributeDataType;
 import java.io.FileReader;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -12,7 +14,10 @@ import com.camaleon.entities.FuncDependency;
 import com.camaleon.entities.LoadFileResult;
 import com.camaleon.entities.Relation;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class LoadFile {
 
@@ -28,11 +33,17 @@ public class LoadFile {
                 Object obj = parser.parse(new FileReader(filePath));
                 JSONObject jsonObject = (JSONObject) obj;
                 JSONArray jsonAttributes = (JSONArray) jsonObject.get("attributes");
-                HashSet<String> attributes = new HashSet<String>();
-                for (Iterator<String> iterator = jsonAttributes.iterator(); iterator
-                        .hasNext();) {
-                    String attribute = (String) iterator.next();
-                    attributes.add(attribute);
+                Map<String, Attribute> attributes = new HashMap<>();
+                for (int i = 0; i < jsonAttributes.size(); i++) {
+                    Attribute attribute = new Attribute();
+                    JSONObject jsonAttribute = (JSONObject) jsonAttributes.get(i);
+                    attribute.setKey(jsonAttribute.get("key").toString());
+                    attribute.setName(jsonAttribute.get("name").toString());
+                    attribute.setType(AttributeDataType.valueOf(jsonAttribute.get("type").toString()));
+                    if (attribute.getType().getValue()) {
+                        attribute.setLength((long) jsonAttribute.get("length"));
+                    }
+                    attributes.put(attribute.getKey(), attribute);
                 }
 
                 relation.setAttributes(attributes);
@@ -47,43 +58,47 @@ public class LoadFile {
                     JSONArray jsonImplicant = (JSONArray) jsonFuncDep
                             .get("implicant");
 
-                    HashSet<String> implicant = new HashSet<String>();
+                    Map<String, Attribute> implicant = new HashMap<>();
                     for (Iterator<String> iterator = jsonImplicant.iterator(); iterator
                             .hasNext();) {
-                        String attribute = (String) iterator.next();
-                        implicant.add(attribute);
+                        String attributekey = (String) iterator.next();
+                        if (relation.getAttributes().containsKey(attributekey)) {
+                            implicant.put(attributekey, relation.getAttributes().get(attributekey));
+                        }
                     }
 
                     JSONArray jsonImplied = (JSONArray) jsonFuncDep.get("implied");
 
-                    HashSet<String> implied = new HashSet<String>();
+                    Map<String, Attribute> implied = new HashMap<>();
                     for (Iterator<String> iterator = jsonImplied.iterator(); iterator
                             .hasNext();) {
-                        String attribute = (String) iterator.next();
-                        implied.add(attribute);
+                        String attributekey = (String) iterator.next();
+                        if (relation.getAttributes().containsKey(attributekey)) {
+                            implied.put(attributekey, relation.getAttributes().get(attributekey));
+                        }
                     }
 
                     funcDependency.setImplicant(implicant);
                     funcDependency.setImplied(implied);
-                    
-                    if(!relation.getAttributes().containsAll(implicant) || !relation.getAttributes().containsAll(implied)){
+
+                    if (!relation.getAttributeKeys().containsAll(funcDependency.getImplicantKeys()) || !relation.getAttributeKeys().containsAll(funcDependency.getImpliedKeys())) {
                         StringBuilder sb = new StringBuilder();
                         sb.append("Alguno de los atributos de la siguiente dependencia funcional no ha sido definido en el conjunto de atributos: ");
                         sb.append(funcDependency);
                         sb.append(".");
-                        
+
                         throw new Exception(sb.toString());
                     }
                     
-                    if (implicant.containsAll(implied)) {
-                       trivialDependencies.add(funcDependency);
+                    if (funcDependency.getImplicantKeys().containsAll(funcDependency.getImpliedKeys())) {
+                        trivialDependencies.add(funcDependency);
                     } else {
                         relation.getDependencies().add(funcDependency);
                     }
                 }
                 loadFileResult.setStatus(LoadFileResult.Status.SUCCESS);
                 loadFileResult.setRelation(relation);
-                if(trivialDependencies.size()>0){
+                if (trivialDependencies.size() > 0) {
                     StringBuilder sb = new StringBuilder();
                     sb.append("- Las siguientes dependencias son triviales y no fueron cargadas: ");
                     sb.append(trivialDependencies);

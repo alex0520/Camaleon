@@ -6,6 +6,7 @@
 package com.camaleon.entities;
 
 import com.google.common.base.Converter;
+import java.util.Map;
 
 /**
  * 
@@ -16,9 +17,8 @@ public class RelationTableConverter extends Converter<Relation, Table>{
     @Override
     protected Table doForward(Relation relation) {
         Table table = new Table(relation.getAttributes().toString());
-        for(String attribute : relation.getAttributes()){
-            Attribute attr = new Attribute(attribute);
-            table.addAttribute(attr);
+        for(Map.Entry<String,Attribute> entry : relation.getAttributes().entrySet()){
+            table.addAttribute(entry.getValue());
         }
         return table;
     }

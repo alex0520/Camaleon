@@ -33,27 +33,27 @@ public class ProyeccionMain {
         if (loadFileResult.getStatus().equals(LoadFileResult.Status.SUCCESS)) {
             Relation relacion = loadFileResult.getRelation();
 
-            HashMap<HashSet<String>, HashSet<String>> closures = new HashMap<HashSet<String>, HashSet<String>>();
+            HashMap<Set<String>, Set<String>> closures = new HashMap<Set<String>, Set<String>>();
             
             relacion.setDependencies(MinimalCover.rightDecomposition(relacion
                     .getDependencies()));
 
             relacion.setDependencies(MinimalCover.removeStrangeElemLeft(
-                    relacion.getDependencies(), closures));
+                    relacion, closures));
 
             relacion.setDependencies(MinimalCover
                     .removeRedundantDependencies(relacion.getDependencies()));
             
             Function<FuncDependency, Dependencia> convertFromFuncDepToDep = new Function<FuncDependency, Dependencia>() {
             public Dependencia apply(FuncDependency t) {
-                Dependencia d = new Dependencia(t.getImplicant(), t.getImplied());
+                Dependencia d = new Dependencia(t.getImplicantKeys(), t.getImpliedKeys());
                 return d;
             }
         };
 
         Set<Dependencia> dependencias = relacion.getDependencies().stream().map(convertFromFuncDepToDep).collect(Collectors.<Dependencia>toSet());
 
-        Function<Dependencia, FuncDependency> convertFromDepToFuncDep = new Function<Dependencia, FuncDependency>() {
+        /*Function<Dependencia, FuncDependency> convertFromDepToFuncDep = new Function<Dependencia, FuncDependency>() {
             public FuncDependency apply(Dependencia t) {
                 FuncDependency f = new FuncDependency(new HashSet<String>(t.getImplicantes()), new HashSet<String>(t.getImplicados()));
                 return f;
@@ -70,7 +70,7 @@ public class ProyeccionMain {
         
             Set<Dependencia> proyeccionResult = proyeccion.obtenerProyeccion(test);
             
-            System.out.println(proyeccionResult);
+            System.out.println(proyeccionResult);*/
         
         }
         
