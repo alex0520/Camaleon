@@ -2,18 +2,13 @@ package com.camaleon.logic;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.camaleon.entities.FuncDependency;
 import com.camaleon.entities.Relation;
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
 /**
@@ -62,7 +57,7 @@ public class CandidateKeys {
 
         if (yesSet.size() > 0) {
             yesHashSet = new HashSet<>(yesSet);
-            Set<String> closureYesSet = Util.closure(yesHashSet,
+            Set<String> closureYesSet = Closure.closure(yesHashSet,
                     relation.getDependencies(), closures);
             if (closureYesSet.size() == relation.getAttributes().size()) {
                 candidateKeys.add(yesHashSet);
@@ -91,7 +86,7 @@ public class CandidateKeys {
             if (yesHashSet.size() > 0) {
                 tempTrySet.addAll(yesHashSet);
             }
-            Set<String> closure = Util.closure(tempTrySet,
+            Set<String> closure = Closure.closure(tempTrySet,
                     relation.getDependencies(), closures);
             if (closure.size() == attrSize) {
                 candidateKeys.add(tempTrySet);

@@ -4,10 +4,11 @@ import com.camaleon.entities.Attribute;
 import com.camaleon.entities.FuncDependency;
 import com.camaleon.entities.Relation;
 import com.google.common.base.Joiner;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Sets;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
 /**
  * Algoritmo de Síntesis de Bernstein
  * @author Lizeth Valbuena, Alexander Lozano
@@ -33,44 +34,21 @@ public class Bernstein {
             }
         }
 
-        com.google.common.base.Function<FuncDependency, Set<String>> impliedFunction = new com.google.common.base.Function<FuncDependency, Set<String>>() {
-            @Override
-            public Set<String> apply(FuncDependency input) {
-                return input.getImpliedKeys();
-            }
-        };
+        HashSet<String> implicantNew = new HashSet<>();
+        HashSet<String> impliedNew = new HashSet<>();
 
-        com.google.common.base.Function<FuncDependency, Set<String>> implicantFunction = new com.google.common.base.Function<FuncDependency, Set<String>>() {
-            @Override
-            public Set<String> apply(FuncDependency input) {
-                return input.getImplicantKeys();
-            }
-        };
-
-        Set<Set<String>> implicant = new HashSet<Set<String>>(
-                Collections2.transform(dependencies,
-                        implicantFunction));
-
-        Set<Set<String>> implied = new HashSet<Set<String>>(
-                Collections2.transform(dependencies,
-                        impliedFunction));
-
-        HashSet<String> implicantNew = new HashSet<String>();
-        HashSet<String> impliedNew = new HashSet<String>();
-
-        for (Set<String> hashSet : implied) {
-            implicantNew.addAll(hashSet);
-        }
-
-        for (Set<String> hashSet : implicant) {
-            impliedNew.addAll(hashSet);
-        }
+        dependencies.stream().map(dependency -> dependency.getImpliedKeys())
+                .collect(Collectors.toSet())
+                .forEach( hashSet-> impliedNew.addAll(hashSet));
+        dependencies.stream().map(dependency -> dependency.getImplicantKeys())
+                .collect(Collectors.toSet())
+                .forEach( hashSet-> implicantNew.addAll(hashSet));
 
         Sets.SetView<String> keys = Sets.difference(Sets.union(implicantNew, impliedNew), attributes);
         if (keys.size() > 0) {
 
             String key = Joiner.on("").join(keys);
-            HashSet<String> values = new HashSet<String>(keys);
+            HashSet<String> values = new HashSet<>(keys);
             partitions.put(key, values);
         }
 
@@ -114,14 +92,14 @@ public class Bernstein {
         TreeMap<String, HashSet<String>> partitions = Bernstein.getPartitions(relation.getAttributeKeys(), relation.getDependencies());
         List<HashSet<String>> cleanPartitions = Bernstein.remDupPartitions(partitions);
 
-        Proyeccion proyeccion = new Proyeccion(relation.getDependencies(), relation.getAttributeKeys());
+        Projection projection = new Projection(relation.getDependencies(), relation.getAttributeKeys());
         for (Iterator<HashSet<String>> iterator = cleanPartitions.iterator(); iterator.hasNext();) {
             HashSet<String> partition = iterator.next();
             Relation relationIn = new Relation();
             Map<String, Attribute> attributeMap = new HashMap<>();
             partition.forEach(attribute -> attributeMap.put(attribute,relation.getAttributes().get(attribute)));
             relation.setAttributes(attributeMap);
-            List<FuncDependency> proyDependencies = new LinkedList<>(proyeccion.obtenerProyeccion(partition));
+            List<FuncDependency> proyDependencies = new LinkedList<>(projection.getProjection(partition));
             relation.setDependencies(proyDependencies);
             proyecciones.add(relation);
         }

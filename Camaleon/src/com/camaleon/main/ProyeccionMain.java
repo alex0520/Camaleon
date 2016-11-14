@@ -10,7 +10,7 @@ import com.camaleon.entities.LoadFileResult;
 import com.camaleon.entities.Relation;
 import com.camaleon.logic.LoadFile;
 import com.camaleon.logic.MinimalCover;
-import com.camaleon.logic.Proyeccion;
+import com.camaleon.logic.Projection;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,7 +43,7 @@ public class ProyeccionMain {
                     .removeRedundantDependencies(relacion.getDependencies()));
 
 
-        Proyeccion proyeccion = new Proyeccion(relacion.getDependencies(),relacion.getAttributeKeys());
+        Projection projection = new Projection(relacion.getDependencies(),relacion.getAttributeKeys());
         
         Set<String> test = new HashSet<>();
         test.add("C");
@@ -51,7 +51,7 @@ public class ProyeccionMain {
         test.add("I");
         test.add("L");
         
-            Set<FuncDependency> proyeccionResult = proyeccion.obtenerProyeccion(test);
+            Set<FuncDependency> proyeccionResult = projection.getProjection(test);
             
             System.out.println(proyeccionResult);
         

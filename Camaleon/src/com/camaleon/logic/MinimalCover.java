@@ -8,24 +8,16 @@ import java.util.List;
 
 import com.camaleon.entities.FuncDependency;
 import com.camaleon.entities.Relation;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
+
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class MinimalCover {
 
     public static List<FuncDependency> rightDecomposition(List<FuncDependency> dependencies) {
 
-        Predicate<FuncDependency> impliedComp = new Predicate<FuncDependency>() {
-            @Override
-            public boolean apply(FuncDependency dependency) {
-                return dependency.getImplied().size() > 1;
-            }
-        };
-
-        List<FuncDependency> compDependencies = new ArrayList<FuncDependency>(
-                Collections2.filter(dependencies, impliedComp));
+        List<FuncDependency> compDependencies = dependencies.stream().filter(dependency -> dependency.getImpliedKeys().size()>1).collect(Collectors.toList());
 
         for (FuncDependency dependency : compDependencies) {
             FuncDependency tempDependency;
@@ -61,7 +53,7 @@ public class MinimalCover {
                     tempImplicant = new ArrayList<>(implicant);
                     if (j < tempImplicant.size()) {
                         tempImplicant.remove(j);
-                        Set<String> closure = Util.closure(new HashSet<String>(tempImplicant), dependencies, closures);
+                        Set<String> closure = Closure.closure(new HashSet<String>(tempImplicant), dependencies, closures);
                         if (closure.containsAll(implied)) {
                             strange = true;
                             FuncDependency tempFuncDep = new FuncDependency();
@@ -98,7 +90,7 @@ public class MinimalCover {
             Set<String> implicant = funcDependency.getImplicantKeys();
             Set<String> implied = funcDependency.getImpliedKeys();
             tempDependencies.remove(i);
-            Set<String> closure = Util.closure(implicant, tempDependencies, null);
+            Set<String> closure = Closure.closure(implicant, tempDependencies, null);
             if (closure.containsAll(implied)) {
                 dependencies.remove(i);
             } else {

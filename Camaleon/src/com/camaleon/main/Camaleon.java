@@ -1,19 +1,16 @@
 package com.camaleon.main;
 
-import com.camaleon.entities.FuncDependency;
 import com.camaleon.entities.LoadFileResult;
 import com.camaleon.entities.Relation;
 import com.camaleon.logic.Bernstein;
 import com.camaleon.logic.CandidateKeys;
 import com.camaleon.logic.LoadFile;
 import com.camaleon.logic.MinimalCover;
-import com.camaleon.logic.segterformanormal.Atribute;
-import com.camaleon.logic.segterformanormal.DependenciaFuncional;
-import com.camaleon.logic.segterformanormal.NormalForm;
 
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class Camaleon {
 
@@ -53,35 +50,28 @@ public class Camaleon {
 
             List<Relation> bernstein = Bernstein.getBernstein(relacion);
             System.out.println("Bernstein:" + bernstein);
-
-            Function<String, Atribute> convertFromStringToAtribute = new Function<String, Atribute>() {
-                @Override
-                public Atribute apply(String t) {
-                    return new Atribute(t);
-                }
-            };
-
+/*
             Function<FuncDependency, DependenciaFuncional> convertFromFuncDepToDepFunc = new Function<FuncDependency, DependenciaFuncional>() {
                 public DependenciaFuncional apply(FuncDependency t) {
-                    List<Atribute> implicante = t.getImplicantKeys().stream().map(convertFromStringToAtribute).collect(Collectors.<Atribute>toList());
-                    List<Atribute> implicado = t.getImpliedKeys().stream().map(convertFromStringToAtribute).collect(Collectors.<Atribute>toList());
+                    List<Atribute> implicante = t.getImplicantKeys().stream().map(key -> new Atribute(key)).collect(Collectors.toList());
+                    List<Atribute> implicado = t.getImpliedKeys().stream().map(key -> new Atribute(key)).collect(Collectors.toList());
                     DependenciaFuncional f = new DependenciaFuncional(implicante, implicado);
                     return f;
                 }
             };
 
             List<DependenciaFuncional> dependencias = relacion.getDependencies().stream().map(convertFromFuncDepToDepFunc).collect(Collectors.<DependenciaFuncional>toList());
-            List<Atribute> atributos = relacion.getAttributeKeys().stream().map(convertFromStringToAtribute).collect(Collectors.<Atribute>toList());
+            List<Atribute> atributos = relacion.getAttributeKeys().stream().map(key -> new Atribute(key)).collect(Collectors.<Atribute>toList());
             List<List<Atribute>> keysList = new ArrayList<>();
             for (Iterator<HashSet<String>> iterator = keys.iterator(); iterator.hasNext();) {
                 HashSet<String> key = iterator.next();
-                List<Atribute> collect = key.stream().map(convertFromStringToAtribute).collect(Collectors.<Atribute>toList());
+                List<Atribute> collect = key.stream().map(str -> new Atribute(str)).collect(Collectors.<Atribute>toList());
                 keysList.add(collect);
             }
             NormalForm normalForm = new NormalForm();
             boolean segundaFormaNormal = normalForm.validarSiEstaEnSegundaFormaNormal(dependencias, atributos, keysList);
             boolean terceraFormaNormal = normalForm.validarSiEstaEnTerceraFormaNormal(dependencias, keysList);
-
+*/
         }
 
     }
