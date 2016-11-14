@@ -11,8 +11,9 @@ import java.util.stream.Collectors;
 import com.camaleon.entities.Relation;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
+
 /**
- * LLaves Candidatas
+ * Clase encargada del calculo de llaves candidatas de una relación
  * @author Lizeth Valbuena, Alexander Lozano
  */
 public class CandidateKeys {

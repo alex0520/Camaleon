@@ -9,7 +9,8 @@ import com.google.common.base.Converter;
 import java.util.Map;
 
 /**
- * 
+ * Convierte una {@link Relation} en una {@link Table}
+ *
  * @author Lizeth Valbuena, Alexander Lozano
  */
 public class RelationTableConverter extends Converter<Relation, Table>{

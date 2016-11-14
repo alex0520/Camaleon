@@ -9,7 +9,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * 
+ * Representa una tabla para la generación del script de base de datos
+ *
  * @author Lizeth Valbuena, Alexander Lozano
  */
 public class Table {

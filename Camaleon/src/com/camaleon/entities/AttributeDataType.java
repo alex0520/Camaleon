@@ -5,6 +5,11 @@
  */
 package com.camaleon.entities;
 
+/**
+ * {@link Enum} que representa el tipo de dato del atributo de la relación
+ *
+ * @author Lizeth Valbuena, Alexander Lozano
+ */
 public enum AttributeDataType {
     VARCHAR(true), NUMBER(false);
 
@@ -14,6 +19,11 @@ public enum AttributeDataType {
         this.requiresLength = requiresLength;
     }
 
+    /**
+     * Obtiene un valor booleano que indica si requiere especificarse
+     * longitud para este tipo de dato
+     * @return valor booleano que indica si se debe especificar longitud para este tipo de dato
+     */
     public boolean getValue() {
         return requiresLength;
     }

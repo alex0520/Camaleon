@@ -3,6 +3,7 @@ package com.camaleon.entities;
 import java.util.*;
 
 /**
+ *Clase que representa una relación
  *
  * @author Lizeth Valbuena, Alexander Lozano
  */
@@ -45,16 +46,17 @@ public class Relation {
         return "Relation [attributes=" + attributes + ", dependencies="
                 + dependencies + "]";
     }
-    
+
+    /**
+     * Obtiene las llaves de los atributos de la relación
+     *
+     * @return Conjunto de llaves de los atributos de la relación
+     */
     public Set<String> getAttributeKeys(){
         return attributes.keySet();
     }
-
-    public Set<String> getAttribute() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
     /**
+     *Modifica el valor de un atributo
      *
      * @param oldValue Valor Actual de un atributo
      * @param newValue Nuevo Valor del atributo
@@ -84,10 +86,10 @@ public class Relation {
     }*/
 
     /**
+     *  Elimina un atributo de la relación
      *
      * @param oldValue Valor del atributo anterior
      */
-    
     /*
     public void delAttr(String oldValue) {
         this.attributes.remove(oldValue);

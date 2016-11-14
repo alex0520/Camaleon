@@ -11,7 +11,8 @@ import java.util.Iterator;
 import java.util.TreeSet;
 import javax.swing.AbstractListModel;
 /**
- * 
+ * {@link javax.swing.ListModel} para ordenar las listas de la interfaz gráfica, alfabeticamente
+ *
  * @author Lizeth Valbuena, Alexander Lozano
  * @param <T> Heredado de la Tabla
  */

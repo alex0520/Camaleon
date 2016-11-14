@@ -11,6 +11,15 @@ import java.util.stream.Collectors;
  * @author Lizeth Valbuena, Alexander Lozano
  */
 public class Closure {
+
+    /**
+     * Calcula el cierre de un conjunto de atributos, de acuerdo a un conjunto de dependencias funcionales
+     *
+     * @param attributes Atributos a los cuales se les quiere calcular el cierre
+     * @param dependencies Cunjunto de dependencias funcionales
+     * @param closures Cierres calculados previamente
+     * @return Conjunto de atributos (cierre)
+     */
     public static Set<String> closure(Set<String> attributes, List<FuncDependency> dependencies,
                                       Map<Set<String>, Set<String>> closures) {
 

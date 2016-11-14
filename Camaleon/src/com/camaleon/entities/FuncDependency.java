@@ -3,7 +3,8 @@ package com.camaleon.entities;
 import java.util.*;
 
 /**
- * 
+ * Clase que representa una dependencia funcional de una relación
+ *
  * @author Lizeth Valbuena, Alexander Lozano
  */
 public class FuncDependency implements Comparable<FuncDependency> {
@@ -18,9 +19,8 @@ public class FuncDependency implements Comparable<FuncDependency> {
         this.implied = new HashMap<>();
     }
     /**
-     * 
-     * @param implicant Dato de tipo HashSet para el implicante
-     * @param implied Dato de tipo HashSet para el implicado
+     * @param implicant el implicante
+     * @param implied el implicado
      */
     public FuncDependency(Map<String, Attribute> implicant, Map<String, Attribute> implied) {
         super();
@@ -59,16 +59,19 @@ public class FuncDependency implements Comparable<FuncDependency> {
     }
 
     /**
-     * * una dependencia es trivial cuando: - el implicante y el implicado son
-     * el mismo atributo - al retirar atributos iguales en implicante o
-     * implicados, alguno de los dos conjuntos de atributos queda vacio.
-     *
-     * @return
+     * Indica si una dependencia funcional es trivial,
+     * es trivial cuando los atributos del implicante, contiene los del implicado
+     * @return boolean que indica si la dependencia es trivial
      */
     public boolean isTrivialDependency() {
         return getImplicantKeys().containsAll(getImpliedKeys());
     }
 
+    /**
+     * Proyecta una dependencia
+     *
+     * @return el conjunto de dependencias proyectadas, a partir de esta dependencia funcional
+     */
     public Set<FuncDependency> project() {
         Set<FuncDependency> projectDependencies = new LinkedHashSet<>();
         for (Map.Entry<String, Attribute> entry : implied.entrySet()) {

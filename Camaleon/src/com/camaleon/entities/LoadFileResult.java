@@ -3,12 +3,18 @@ package com.camaleon.entities;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 /**
- * 
+ * Clase que indica el resultado de la carga de una {@link Relation}
+ * desde un archivo JSON
+ *
  * @author Lizeth Valbuena, Alexander Lozano
  */
 public class LoadFileResult {
 
+    /**
+     * {@link Enum} que representa el resultado del proceso de carga
+     */
     public enum Status {
         SUCCESS, ERROR
     }
@@ -18,13 +24,7 @@ public class LoadFileResult {
     private List<String> messages;
 
     public LoadFileResult() {
-        messages = new ArrayList<String>();
-    }
-
-    public LoadFileResult(Status status, Relation relation, List<String> messages) {
-        this.status = status;
-        this.relation = relation;
-        this.messages = messages;
+        messages = new ArrayList<>();
     }
 
     public Status getStatus() {

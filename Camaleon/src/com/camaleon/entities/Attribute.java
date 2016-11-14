@@ -8,7 +8,8 @@ package com.camaleon.entities;
 import java.util.Objects;
 
 /**
- * 
+ * Clase que representa un atributo de una relación
+ *
  * @author Lizeth Valbuena, Alexander Lozano
  */
 public class Attribute {
