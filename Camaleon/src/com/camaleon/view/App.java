@@ -564,7 +564,7 @@ public class App extends javax.swing.JFrame {
                     relation.getDependencies()));
             keys = CandidateKeys.candidateKeys(relation,
                     closures);
-            List<Relation> bernstein = Bernstein.getBernstein(relation.getAttributeKeys(), relation.getDependencies());
+            List<Relation> bernstein = Bernstein.getBernstein(relation);
             dlmSintesis.clear();
             for (int i = 0; i < bernstein.size(); i++) {
                 Table table = relationTableConverter.convert(bernstein.get(i));

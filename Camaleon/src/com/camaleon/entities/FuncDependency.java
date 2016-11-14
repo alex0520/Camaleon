@@ -1,9 +1,7 @@
 package com.camaleon.entities;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
 /**
  * 
  * @author Lizeth Valbuena, Alexander Lozano
@@ -60,8 +58,29 @@ public class FuncDependency implements Comparable<FuncDependency> {
                 + implied + "]";
     }
 
+    /**
+     * * una dependencia es trivial cuando: - el implicante y el implicado son
+     * el mismo atributo - al retirar atributos iguales en implicante o
+     * implicados, alguno de los dos conjuntos de atributos queda vacio.
+     *
+     * @return
+     */
+    public boolean isTrivialDependency() {
+        return getImplicantKeys().containsAll(getImpliedKeys());
+    }
+
+    public Set<FuncDependency> project() {
+        Set<FuncDependency> projectDependencies = new LinkedHashSet<>();
+        for (Map.Entry<String, Attribute> entry : implied.entrySet()) {
+            Map<String, Attribute> map = new HashMap<>();
+            map.put(entry.getKey(), entry.getValue());
+            projectDependencies
+                    .add(new FuncDependency(implicant, map));
+        }
+        return projectDependencies;
+    }
+
     @Override
-    
     public int compareTo(FuncDependency o) {
         if (this.implicant.size() < o.implicant.size()) {
             return -1;

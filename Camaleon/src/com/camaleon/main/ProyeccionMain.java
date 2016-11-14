@@ -10,13 +10,11 @@ import com.camaleon.entities.LoadFileResult;
 import com.camaleon.entities.Relation;
 import com.camaleon.logic.LoadFile;
 import com.camaleon.logic.MinimalCover;
-import com.camaleon.logic.proyeccion.Dependencia;
-import com.camaleon.logic.proyeccion.Proyeccion;
+import com.camaleon.logic.Proyeccion;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  *
@@ -28,7 +26,7 @@ public class ProyeccionMain {
      * @param args
      */
     public static void main(String[] args) {
-        LoadFileResult loadFileResult = LoadFile.loadFile("C:/Users/ASUS/Downloads/proyeccion.json");
+        LoadFileResult loadFileResult = LoadFile.loadFile("C:/Users/ASUS/Downloads/proyeccion_attr.json");
         
         if (loadFileResult.getStatus().equals(LoadFileResult.Status.SUCCESS)) {
             Relation relacion = loadFileResult.getRelation();
@@ -43,24 +41,9 @@ public class ProyeccionMain {
 
             relacion.setDependencies(MinimalCover
                     .removeRedundantDependencies(relacion.getDependencies()));
-            
-            Function<FuncDependency, Dependencia> convertFromFuncDepToDep = new Function<FuncDependency, Dependencia>() {
-            public Dependencia apply(FuncDependency t) {
-                Dependencia d = new Dependencia(t.getImplicantKeys(), t.getImpliedKeys());
-                return d;
-            }
-        };
 
-        Set<Dependencia> dependencias = relacion.getDependencies().stream().map(convertFromFuncDepToDep).collect(Collectors.<Dependencia>toSet());
 
-        /*Function<Dependencia, FuncDependency> convertFromDepToFuncDep = new Function<Dependencia, FuncDependency>() {
-            public FuncDependency apply(Dependencia t) {
-                FuncDependency f = new FuncDependency(new HashSet<String>(t.getImplicantes()), new HashSet<String>(t.getImplicados()));
-                return f;
-            }
-        };
-
-        Proyeccion proyeccion = new Proyeccion(dependencias, relacion.getAttributes());
+        Proyeccion proyeccion = new Proyeccion(relacion.getDependencies(),relacion.getAttributeKeys());
         
         Set<String> test = new HashSet<>();
         test.add("C");
@@ -68,9 +51,9 @@ public class ProyeccionMain {
         test.add("I");
         test.add("L");
         
-            Set<Dependencia> proyeccionResult = proyeccion.obtenerProyeccion(test);
+            Set<FuncDependency> proyeccionResult = proyeccion.obtenerProyeccion(test);
             
-            System.out.println(proyeccionResult);*/
+            System.out.println(proyeccionResult);
         
         }
         

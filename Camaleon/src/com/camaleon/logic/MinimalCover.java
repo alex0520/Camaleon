@@ -45,7 +45,7 @@ public class MinimalCover {
     }
 
     public static List<FuncDependency> removeStrangeElemLeft(Relation relation,
-            Map<Set<String>, Set<String>> closures) {
+                                                             Map<Set<String>, Set<String>> closures) {
         int i = 0;
         int j = 0;
         List<FuncDependency> dependencies = relation.getDependencies();
@@ -93,7 +93,7 @@ public class MinimalCover {
         List<FuncDependency> tempDependencies;
         int i = 0;
         do {
-            tempDependencies = new ArrayList<FuncDependency>(dependencies);
+            tempDependencies = new ArrayList<>(dependencies);
             FuncDependency funcDependency = tempDependencies.get(i);
             Set<String> implicant = funcDependency.getImplicantKeys();
             Set<String> implied = funcDependency.getImpliedKeys();

@@ -1,11 +1,6 @@
 package com.camaleon.entities;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  *
@@ -19,11 +14,11 @@ public class Relation {
     public Relation() {
         super();
         this.attributes = new HashMap<>();
-        this.dependencies = new ArrayList<>();
+        this.dependencies = new LinkedList<>();
     }
 
     public Relation(Map<String, Attribute> attributes,
-            List<FuncDependency> dependencies) {
+                    List<FuncDependency> dependencies) {
         super();
         this.attributes = attributes;
         this.dependencies = dependencies;

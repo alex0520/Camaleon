@@ -13,32 +13,26 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
+
 import java.util.Comparator;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Util {
 
     public static Set<String> closure(Set<String> attributes, List<FuncDependency> dependencies,
-            Map<Set<String>, Set<String>> closures) {
+                                      Map<Set<String>, Set<String>> closures) {
 
         if (closures == null) {
             closures = new HashMap<Set<String>, Set<String>>();
         }
 
         if (!closures.containsKey(attributes)) {
-            HashSet<String> closure = new HashSet<String>();
-            HashSet<String> closureNew = new HashSet<String>();
+            HashSet<String> closure = new HashSet<>();
+            HashSet<String> closureNew = new HashSet<>();
             closureNew.addAll(attributes);
 
-            Function<FuncDependency, Set<String>> function = new Function<FuncDependency, Set<String>>() {
-                @Override
-                public Set<String> apply(FuncDependency input) {
-                    return input.getImplicantKeys();
-                }
-            };
-
-            Set<Set<String>> implicants = new HashSet<Set<String>>(
-                    Collections2.transform(dependencies, function));
+            Set<Set<String>> implicants = dependencies.stream().map(dependency -> dependency.getImplicantKeys()).collect(Collectors.toSet());
 
             do {
                 closure.addAll(closureNew);
@@ -47,21 +41,15 @@ public class Util {
 
                     final SetView<Set<String>> intersection = Sets.intersection(implicants, powerSet);
 
-                    Predicate<FuncDependency> crossDependencies = new Predicate<FuncDependency>() {
-                        @Override
-                        public boolean apply(FuncDependency dependency) {
-                            Set<String> implicant = dependency.getImplicantKeys();
-                            for (Set<String> hashSet : intersection) {
-                                if (hashSet.containsAll(implicant)) {
-                                    return true;
-                                }
+                    List<FuncDependency> crossDep = dependencies.stream().filter(dependency -> {
+                        Set<String> implicant = dependency.getImplicantKeys();
+                        for (Set<String> hashSet : intersection) {
+                            if (hashSet.containsAll(implicant)) {
+                                return true;
                             }
-                            return false;
                         }
-                    };
-
-                    List<FuncDependency> crossDep = new ArrayList<FuncDependency>(
-                            Collections2.filter(dependencies, crossDependencies));
+                        return false;
+                    }).collect(Collectors.toList());
 
                     for (FuncDependency funcDependency : crossDep) {
                         closureNew.addAll(funcDependency.getImpliedKeys());
@@ -86,4 +74,15 @@ public class Util {
 
     };
 
+    public static Set<String> diferenciaConjuntos(Set<String> atributosT, Set<String> atributosY) {
+        return Sets.difference(atributosT, atributosY);
+    }
+
+    public static Set unirConjuntos(Set conjuntoA, Set conjuntoB) {
+        return Sets.union(conjuntoA, conjuntoB);
+    }
+
+    public static Set<FuncDependency> diferenciaConjuntoDep(Set<FuncDependency> A, Set<FuncDependency> B) {
+        return Sets.difference(Sets.union(A, B), Sets.intersection(A, B));
+    }
 }

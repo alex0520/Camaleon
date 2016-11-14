@@ -2,23 +2,16 @@ package com.camaleon.main;
 
 import com.camaleon.entities.FuncDependency;
 import com.camaleon.entities.LoadFileResult;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-
 import com.camaleon.entities.Relation;
 import com.camaleon.logic.Bernstein;
 import com.camaleon.logic.CandidateKeys;
 import com.camaleon.logic.LoadFile;
 import com.camaleon.logic.MinimalCover;
-import com.camaleon.logic.proyeccion.Dependencia;
 import com.camaleon.logic.segterformanormal.Atribute;
 import com.camaleon.logic.segterformanormal.DependenciaFuncional;
 import com.camaleon.logic.segterformanormal.NormalForm;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeMap;
+
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -58,7 +51,7 @@ public class Camaleon {
 
             System.out.println("LLaves Candidatas: " + keys);
 
-            List<Relation> bernstein = Bernstein.getBernstein(relacion.getAttributeKeys(), relacion.getDependencies());
+            List<Relation> bernstein = Bernstein.getBernstein(relacion);
             System.out.println("Bernstein:" + bernstein);
 
             Function<String, Atribute> convertFromStringToAtribute = new Function<String, Atribute>() {

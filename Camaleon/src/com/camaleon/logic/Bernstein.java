@@ -1,21 +1,13 @@
 package com.camaleon.logic;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.TreeMap;
-
+import com.camaleon.entities.Attribute;
 import com.camaleon.entities.FuncDependency;
 import com.camaleon.entities.Relation;
-import com.camaleon.logic.proyeccion.Dependencia;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Sets;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+
+import java.util.*;
 /**
  * Algoritmo de Síntesis de Bernstein
  * @author Lizeth Valbuena, Alexander Lozano
@@ -28,7 +20,7 @@ public class Bernstein {
  * @return 
  */
     public static TreeMap<String, HashSet<String>> getPartitions(Set<String> attributes, List<FuncDependency> dependencies) {
-        TreeMap<String, HashSet<String>> partitions = new TreeMap<String, HashSet<String>>();
+        TreeMap<String, HashSet<String>> partitions = new TreeMap<>();
         for (int i = 0; i < dependencies.size(); i++) {
             String key = Joiner.on("").join(dependencies.get(i).getImplicantKeys());
             if (partitions.containsKey(key)) {
@@ -86,7 +78,7 @@ public class Bernstein {
     }
 
     public static List<HashSet<String>> remDupPartitions(TreeMap<String, HashSet<String>> partitions) {
-        List<HashSet<String>> cleanPartitions = new ArrayList<HashSet<String>>();
+        List<HashSet<String>> cleanPartitions = new ArrayList<>();
         int i = 0;
         LinkedList<HashSet<String>> list = new LinkedList(partitions.values());
         
@@ -114,41 +106,25 @@ public class Bernstein {
     }
 /**
  * Automatización del procedimiento establecido del algoritmo de Síntesis de Bernstein
- * @param attributes Lista de atributos
- * @param dependencies Lista de dependencias funcionales
+ * @param relation la relación de la que desea calcular las particiones
  * @return 
  */
-    public static List<Relation> getBernstein(Set<String> attributes, List<FuncDependency> dependencies) {
-        List<Relation> proyecciones = new ArrayList<Relation>();
-        TreeMap<String, HashSet<String>> partitions = Bernstein.getPartitions(attributes, dependencies);
+    public static List<Relation> getBernstein(Relation relation) {
+        List<Relation> proyecciones = new ArrayList<>();
+        TreeMap<String, HashSet<String>> partitions = Bernstein.getPartitions(relation.getAttributeKeys(), relation.getDependencies());
         List<HashSet<String>> cleanPartitions = Bernstein.remDupPartitions(partitions);
-        Function<FuncDependency, Dependencia> convertFromFuncDepToDep = new Function<FuncDependency, Dependencia>() {
-            public Dependencia apply(FuncDependency t) {
-                Dependencia d = new Dependencia(t.getImplicantKeys(), t.getImpliedKeys());
-                return d;
-            }
-        };
 
-        Set<Dependencia> dependencias = dependencies.stream().map(convertFromFuncDepToDep).collect(Collectors.<Dependencia>toSet());
-
-        /*
-        Function<Dependencia, FuncDependency> convertFromDepToFuncDep = new Function<Dependencia, FuncDependency>() {
-            public FuncDependency apply(Dependencia t) {
-                FuncDependency f = new FuncDependency(new HashSet<String>(t.getImplicantes()), new HashSet<String>(t.getImplicados()));
-                return f;
-            }
-        };
-
-        Proyeccion proyeccion = new Proyeccion(dependencias, attributes);
+        Proyeccion proyeccion = new Proyeccion(relation.getDependencies(), relation.getAttributeKeys());
         for (Iterator<HashSet<String>> iterator = cleanPartitions.iterator(); iterator.hasNext();) {
             HashSet<String> partition = iterator.next();
-            Relation relation = new Relation();
-            relation.setAttributes(partition);
-            Set<Dependencia> proyDependencies = proyeccion.obtenerProyeccion(partition);
-            List<FuncDependency> proyDepList = proyDependencies.stream().map(convertFromDepToFuncDep).collect(Collectors.<FuncDependency>toList());
-            relation.setDependencies(proyDepList);
+            Relation relationIn = new Relation();
+            Map<String, Attribute> attributeMap = new HashMap<>();
+            partition.forEach(attribute -> attributeMap.put(attribute,relation.getAttributes().get(attribute)));
+            relation.setAttributes(attributeMap);
+            List<FuncDependency> proyDependencies = new LinkedList<>(proyeccion.obtenerProyeccion(partition));
+            relation.setDependencies(proyDependencies);
             proyecciones.add(relation);
-        }*/
+        }
         return proyecciones;
     }
 }
