@@ -18,7 +18,7 @@ public class Closure {
      * @param attributes Atributos a los cuales se les quiere calcular el cierre
      * @param dependencies Cunjunto de dependencias funcionales
      * @param closures Cierres calculados previamente
-     * @return Conjunto de atributos (cierre)
+     * @return {@link Set} Conjunto de atributos (cierre)
      */
     public static Set<String> closure(Set<String> attributes, List<FuncDependency> dependencies,
                                       Map<Set<String>, Set<String>> closures) {

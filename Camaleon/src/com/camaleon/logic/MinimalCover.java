@@ -13,8 +13,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Clase encargada de calcular el recubrimiento minimo de una relación
+ *
+ * @author Lizeth Valbuena, Alexander Lozano
+ */
 public class MinimalCover {
 
+    /**
+     * Divide las dependencias funcionales con implicante compuesto, para obtener dependencias funcionales con implicado simple
+     *
+     * @param dependencies Conjunto de dependencias funcionales
+     * @return {@link List} Lista de dependencias funcionales con implicantes individuales
+     */
     public static List<FuncDependency> rightDecomposition(List<FuncDependency> dependencies) {
 
         List<FuncDependency> compDependencies = dependencies.stream().filter(dependency -> dependency.getImpliedKeys().size()>1).collect(Collectors.toList());
@@ -36,6 +47,13 @@ public class MinimalCover {
         return dependencies;
     }
 
+    /**
+     * Elimina elementos extraños en el implicante de una {@link FuncDependency}
+     *
+     * @param relation La relación que contiene las dependencias funcionales
+     * @param closures Clausuras previamente calculadas
+     * @return {@link List} Lista de dependencias funcionales, sin elementos extraños en el implicante
+     */
     public static List<FuncDependency> removeStrangeElemLeft(Relation relation,
                                                              Map<Set<String>, Set<String>> closures) {
         int i = 0;
@@ -47,7 +65,8 @@ public class MinimalCover {
             if (funcDependency.getImplicant().size() > 1) {
                 Set<String> implicant = funcDependency.getImplicantKeys();
                 Set<String> implied = funcDependency.getImpliedKeys();
-                List<String> tempImplicant = new ArrayList<>(implicant);
+                List<String> tempImplicant;
+                tempImplicant = new ArrayList<>(implicant);
 
                 do {
                     tempImplicant = new ArrayList<>(implicant);
@@ -81,6 +100,12 @@ public class MinimalCover {
         return dependencies;
     }
 
+    /**
+     * Elimina {@link FuncDependency} redundantes
+     *
+     * @param dependencies Lista de dependencias funcionales
+     * @return {@link List} Lista de dependencias funcionales, sin dependencias funcionales redundantes
+     */
     public static List<FuncDependency> removeRedundantDependencies(List<FuncDependency> dependencies) {
         List<FuncDependency> tempDependencies;
         int i = 0;

@@ -12,8 +12,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
+ * Clase encargada de calcular las proyecciones de una {@link FuncDependency}
  *
- * @author senneko
+ * @author Lizeth Valbuena, Alexander Lozano
  */
 public class Projection {
 
@@ -26,10 +27,10 @@ public class Projection {
     }
 
     /**
-     * retira las dependencies triviales del conjunto de dependencies dado.
+     * Retira las dependencies triviales del conjunto de dependencies dado.
      *
      * @param dependencySet
-     * @return
+     * @return {@link Set} Conjunto de dependencias funcionales sin dependencias triviales
      */
     public Set<FuncDependency> removeTrivialDependencies(Set<FuncDependency> dependencySet) {
         return dependencySet.stream()
@@ -37,6 +38,13 @@ public class Projection {
                 .collect(Collectors.toSet());
     }
 
+    /**
+     * Ejecuta el axioma de Armstron de transitividad, sobre un conjunto de {@link FuncDependency}
+     *
+     * @param dependencySet Conjunto de dependencias funcionales
+     * @param attribute Atributo del que se quiere quitar de la proyección
+     * @return {@link Set} Conjunto de dependencias funcionales sin el atributo enviado
+     */
     public Set<FuncDependency> transitivityAxiom(Set<FuncDependency> dependencySet, String attribute) {
         Set<FuncDependency> result;
         if (dependencySet.size() > 1) {
@@ -78,7 +86,12 @@ public class Projection {
         return result;
     }
 
-
+    /**
+     * Obtiene la proyección de una {@link FuncDependency}
+     *
+     * @param attributeSet
+     * @return {@link Set} Conjunto de dependencias funcionales proyectadas
+     */
     public Set<FuncDependency> getProjection(Set<String> attributeSet) {
         Set<FuncDependency> dependencySetG = new HashSet<>(dependencies);
         Set<String> attributeSetW = Util.setDifference(attributes, attributeSet);
@@ -100,6 +113,13 @@ public class Projection {
         return dependencySetG;
     }
 
+    /**
+     * Obtiene las {@link FuncDependency} que contienen un atributo
+     *
+     * @param A El atributo a buscar
+     * @param G El conjunto de dependencias funcionales
+     * @return {@link Set} Conjunto de dependencias funcionales que contienen el atributo enviado
+     */
     private Set<FuncDependency> getFuncDependencyContainsAttribute(Set<String> A, Set<FuncDependency> G) {
         return G.stream().filter(dep -> dep.getImpliedKeys().containsAll(A)|| dep.getImplicantKeys().containsAll(A)).collect(Collectors.toSet());
     }

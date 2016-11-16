@@ -15,6 +15,10 @@ import java.util.Map;
  */
 public class RelationTableConverter extends Converter<Relation, Table>{
 
+    /*
+	 * (non-Javadoc)
+	 * @see com.google.common.base.Converter#doForward
+	 */
     @Override
     protected Table doForward(Relation relation) {
         Table table = new Table(relation.getAttributes().toString());
@@ -24,6 +28,10 @@ public class RelationTableConverter extends Converter<Relation, Table>{
         return table;
     }
 
+    /*
+	 * (non-Javadoc)
+	 * @see com.google.common.base.Converter#doBackward
+	 */
     @Override
     protected Relation doBackward(Table b) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.

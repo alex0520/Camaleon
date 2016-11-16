@@ -18,10 +18,7 @@ public class FuncDependency implements Comparable<FuncDependency> {
         this.implicant = new HashMap<>();
         this.implied = new HashMap<>();
     }
-    /**
-     * @param implicant el implicante
-     * @param implied el implicado
-     */
+
     public FuncDependency(Map<String, Attribute> implicant, Map<String, Attribute> implied) {
         super();
         this.implicant = implicant;
@@ -70,7 +67,7 @@ public class FuncDependency implements Comparable<FuncDependency> {
     /**
      * Proyecta una dependencia
      *
-     * @return el conjunto de dependencias proyectadas, a partir de esta dependencia funcional
+     * @return {@link Set} con las dependencias proyectadas, a partir de esta dependencia funcional
      */
     public Set<FuncDependency> project() {
         Set<FuncDependency> projectDependencies = new LinkedHashSet<>();

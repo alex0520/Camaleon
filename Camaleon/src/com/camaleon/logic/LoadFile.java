@@ -19,11 +19,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+
+/**
+ * Clase encargada de realizar la carga de una {@link Relation} a partir
+ * de un archivo JSON
+ * @author Lizeth Valbuena, Alexander Lozano
+ */
 public class LoadFile {
 
-    @SuppressWarnings("unchecked")
+    /**
+     * Metodo que se encarga de la carga de una {@link Relation} a partir
+     * de un archivo JSON
+     *
+     * @param filePath Ruta del archivo
+     * @return Objeto {@link LoadFileResult} con el resultado de la carga
+     */
     public static LoadFileResult loadFile(String filePath) {
-
         LoadFileResult loadFileResult = new LoadFileResult();
         Relation relation = new Relation();
         JSONParser parser = new JSONParser();

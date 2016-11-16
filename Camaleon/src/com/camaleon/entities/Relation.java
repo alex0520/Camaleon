@@ -3,7 +3,7 @@ package com.camaleon.entities;
 import java.util.*;
 
 /**
- *Clase que representa una relación
+ * Clase que representa una relación
  *
  * @author Lizeth Valbuena, Alexander Lozano
  */
@@ -50,11 +50,12 @@ public class Relation {
     /**
      * Obtiene las llaves de los atributos de la relación
      *
-     * @return Conjunto de llaves de los atributos de la relación
+     * @return {@link Set} con las llaves de los atributos de la relación
      */
     public Set<String> getAttributeKeys(){
         return attributes.keySet();
     }
+
     /**
      *Modifica el valor de un atributo
      *

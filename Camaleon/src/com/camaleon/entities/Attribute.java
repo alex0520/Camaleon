@@ -26,11 +26,7 @@ public class Attribute {
         this.key = key;
         this.name = name;
     }
-    /**
-     * @param key 
-     * @param name Attribute
-     * @param type 
-     */
+
     public Attribute(String key, String name, AttributeDataType type) {
         this.key = key;
         this.name = name;

@@ -19,9 +19,9 @@ public class Bernstein {
     /**
      * Obtiene las particiones con base a un universo discurso compuesto de dependencias funcionales y atributos
      *
-     * @param attributes   Lista de atributos
+     * @param attributes Lista de atributos
      * @param dependencies Lista de dependencias funcionales
-     * @return
+     * @return {@link TreeMap} Con las particiones de la relación
      */
     public static TreeMap<String, HashSet<String>> getPartitions(Set<String> attributes, List<FuncDependency> dependencies) {
         TreeMap<String, HashSet<String>> partitions = new TreeMap<>();
@@ -59,10 +59,10 @@ public class Bernstein {
     }
 
     /**
-     * Elimina las dependencias funcionales duplicadas, de un conjunto de {@link FuncDependency}
+     * Elimina las particiones duplicadas, de un conjunto de particiones
      *
-     * @param partitions Conjunto de {@link FuncDependency}
-     * @return Conjunto de {@link FuncDependency}  sin dependencias duplicadas
+     * @param partitions Conjunto de particiones
+     * @return {@link List} Lista de particiones sin dependencias duplicadas
      */
     public static List<HashSet<String>> remDupPartitions(TreeMap<String, HashSet<String>> partitions) {
         List<HashSet<String>> cleanPartitions = new ArrayList<>();
@@ -96,7 +96,7 @@ public class Bernstein {
      * Automatización del procedimiento establecido del algoritmo de Síntesis de Bernstein
      *
      * @param relation la relación de la que desea calcular las particiones
-     * @return Listado de particiones
+     * @return {@link List} Listado de particiones
      */
     public static List<Relation> getBernstein(Relation relation) {
         List<Relation> proyecciones = new ArrayList<>();

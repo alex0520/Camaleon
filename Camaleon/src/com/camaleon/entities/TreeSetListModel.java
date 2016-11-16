@@ -65,6 +65,11 @@ public class TreeSetListModel<T extends Comparable<T>> extends AbstractListModel
         return -1;
     }
 
+    /**
+     * Agrega un elemento al modelo
+     * @param t el elemento a agregar
+     * @return boolean indicando el resultado de la acción
+     */
     public boolean add(T t) {
         boolean result = treeSet.add(t);
         if (result) {
@@ -74,6 +79,11 @@ public class TreeSetListModel<T extends Comparable<T>> extends AbstractListModel
         return result;
     }
 
+    /**
+     * Elimina un elemento al modelo
+     * @param t el elemento a eliminar
+     * @return boolean indicando el resultado de la acción
+     */
     public boolean remove(T t) {
         int index = getIndexOf(t);
         if (index < 0) {
@@ -84,12 +94,20 @@ public class TreeSetListModel<T extends Comparable<T>> extends AbstractListModel
         return result;
     }
 
+    /**
+     * Limpia el modelo
+     */
     public void clear() {
         int size = treeSet.size();
         treeSet.clear();
         fireIntervalRemoved(this, 0, ((size-1)<0)?0:(size-1));
     }
-    
+
+    /**
+     * Obtiene todos los elementos del modelo
+     *
+     * @return {@link HashSet} los elementos del modelo
+     */
     public HashSet<T> getAllElements(){
         HashSet<T> result = new HashSet<>(treeSet);
         return result;

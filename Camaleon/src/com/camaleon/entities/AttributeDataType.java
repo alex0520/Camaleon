@@ -22,7 +22,7 @@ public enum AttributeDataType {
     /**
      * Obtiene un valor booleano que indica si requiere especificarse
      * longitud para este tipo de dato
-     * @return valor booleano que indica si se debe especificar longitud para este tipo de dato
+     * @return boolean valor que indica si se debe especificar longitud para este tipo de dato
      */
     public boolean getValue() {
         return requiresLength;

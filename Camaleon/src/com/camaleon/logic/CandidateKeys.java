@@ -18,10 +18,11 @@ import com.google.common.collect.Sets.SetView;
  */
 public class CandidateKeys {
     /**
-     * 
+     * Obtiene las llaves candidatas de una relación
+     *
      * @param relation Tipo de dato relación compuesto por una lista de atributos y dependencias funcionales correspondientes a un universo discurso
      * @param closures Listado de clausuras previamente calculadas para dicho universo discurso.
-     * @return 
+     * @return {@link List} Listado de dependencias funcionales
      */
     public static List<HashSet<String>> candidateKeys(Relation relation,
             HashMap<Set<String>, Set<String>> closures) {
