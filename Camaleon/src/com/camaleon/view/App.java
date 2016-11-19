@@ -44,14 +44,14 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public class App extends javax.swing.JFrame {
 
     Relation relation = new Relation();
-    TreeMap<String, HashSet<String>> partitions = new TreeMap<String, HashSet<String>>();
-    List<HashSet<String>> cleanPartitions = new ArrayList<HashSet<String>>();
-    List<HashSet<String>> keys = new ArrayList<HashSet<String>>();
-    HashMap<Set<String>, Set<String>> closures = new HashMap<Set<String>, Set<String>>();
-    TreeSetListModel<String> tslmAtributos = new TreeSetListModel<String>(String.CASE_INSENSITIVE_ORDER);
-    TreeSetListModel<FuncDependency> tslmDepFuncionales = new TreeSetListModel<FuncDependency>();
-    DefaultListModel<Table> dlmSintesis = new DefaultListModel<Table>();
-    List<Table> tables = new LinkedList<>();
+    TreeMap<String, HashSet<String>> partitions = new TreeMap<>();
+    List<HashSet<String>> cleanPartitions = new ArrayList<>();
+    List<HashSet<String>> keys = new ArrayList<>();
+    HashMap<Set<String>, Set<String>> closures = new HashMap<>();
+    TreeSetListModel<Attribute> tslmAtributos = new TreeSetListModel<>();
+    TreeSetListModel<FuncDependency> tslmDepFuncionales = new TreeSetListModel<>();
+    DefaultListModel<Table> dlmSintesis = new DefaultListModel<>();
+    Map<String, Table> tables = new HashMap<>();
     RelationTableConverter relationTableConverter = new RelationTableConverter();
 
     /**
@@ -342,9 +342,10 @@ public class App extends javax.swing.JFrame {
             LoadFileResult loadFileResult = LoadFile.loadFile(path);
             if (loadFileResult.getStatus().equals(LoadFileResult.Status.SUCCESS)) {
                 relation = loadFileResult.getRelation();
-                for (Iterator<String> iterator = relation.getAttributeKeys().iterator(); iterator.hasNext();) {
-                    tslmAtributos.add(iterator.next());
+                for(Map.Entry<String, Attribute> entry : relation.getAttributes().entrySet()){
+                    tslmAtributos.add(entry.getValue());
                 }
+                
                 for (Iterator<FuncDependency> iterator = relation.getDependencies().iterator(); iterator.hasNext();) {
                     tslmDepFuncionales.add(iterator.next());
                 }
@@ -371,22 +372,9 @@ public class App extends javax.swing.JFrame {
     }//GEN-LAST:event_btnCargarActionPerformed
 
     private void btnAddAtrActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddAtrActionPerformed
-        String attr = JOptionPane.showInputDialog(
-                JOptionPane
-                        .getFrameForComponent((Component) evt.getSource()),
-                "Ingrese el atributo",
-                "Nuevo Atributo",
-                JOptionPane.QUESTION_MESSAGE
-        );
-        if (attr != null) {
-            relation.getAttributes().put(attr, new Attribute(attr,attr));
-            tslmAtributos.add(attr);
-            if (tslmAtributos.getSize() > 1) {
-                jtpVista.setEnabledAt(1, true);
-            }
-            dlmSintesis.clear();
-        }
-
+        AttributeForm attributeForm =  new AttributeForm(this, null, this.relation.getAttributeKeys());
+        attributeForm.setVisible(true);
+        dlmSintesis.clear();        
     }//GEN-LAST:event_btnAddAtrActionPerformed
 
     private void jlAtributosValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jlAtributosValueChanged
@@ -402,7 +390,10 @@ public class App extends javax.swing.JFrame {
     private void btnEditAtrActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditAtrActionPerformed
         int selected = jlAtributos.getSelectedIndex();
         if (selected > -1) {
-            List<String> attributes = new ArrayList<String>(relation.getAttributeKeys());
+            Attribute attr = jlAtributos.getSelectedValue();
+            AttributeForm attributeForm =  new AttributeForm(this, attr,this.relation.getAttributeKeys());
+            attributeForm.setVisible(true);
+            /*List<String> attributes = new ArrayList<String>(relation.getAttributeKeys());
             String attr = attributes.get(selected);
             String newAttr = (String) JOptionPane.showInputDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Ingrese el nombre del atributo", "Editar atributo", JOptionPane.OK_CANCEL_OPTION, null, null, attr);
             if (newAttr != null && !newAttr.equals("")) {
@@ -413,7 +404,7 @@ public class App extends javax.swing.JFrame {
                 tslmAtributos.add(newAttr);
                 rePaintDepFunc(tslmDepFuncionales);
                 dlmSintesis.clear();
-            }
+            }*/
         }
     }//GEN-LAST:event_btnEditAtrActionPerformed
 
@@ -421,8 +412,8 @@ public class App extends javax.swing.JFrame {
         if (jlAtributos.getSelectedIndex() > -1) {
             int confirm = JOptionPane.showConfirmDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Está seguro de eliminar el atributo: " + jlAtributos.getSelectedValue(), "Confirmar", JOptionPane.OK_CANCEL_OPTION);
             if (confirm == JOptionPane.OK_OPTION) {
-                String attr = jlAtributos.getSelectedValue();
-                //relation.delAttr(attr);
+                Attribute attr = jlAtributos.getSelectedValue();
+                relation.delAttr(attr.getKey());
                 tslmAtributos.remove(attr);
                 rePaintDepFunc(tslmDepFuncionales);
                 dlmSintesis.clear();
@@ -431,7 +422,7 @@ public class App extends javax.swing.JFrame {
     }//GEN-LAST:event_btnDelAtrActionPerformed
 
     private void btnAddDepFuncActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddDepFuncActionPerformed
-        FuncDependencyForm funcDependencyForm = new FuncDependencyForm(this, new FuncDependency(), relation.getAttributeKeys());
+        FuncDependencyForm funcDependencyForm = new FuncDependencyForm(this, new FuncDependency(), relation.getAttributes());
         funcDependencyForm.setVisible(true);
         dlmSintesis.clear();
     }//GEN-LAST:event_btnAddDepFuncActionPerformed
@@ -439,7 +430,7 @@ public class App extends javax.swing.JFrame {
     private void btnEditDepFuncActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditDepFuncActionPerformed
         if (jlDepFuncionales.getSelectedIndex() > -1) {
             FuncDependency funcDep = jlDepFuncionales.getSelectedValue();
-            FuncDependencyForm funcDependencyForm = new FuncDependencyForm(this, funcDep, relation.getAttributeKeys());
+            FuncDependencyForm funcDependencyForm = new FuncDependencyForm(this, funcDep, relation.getAttributes());
             funcDependencyForm.setVisible(true);
             dlmSintesis.clear();
         }
@@ -564,11 +555,11 @@ public class App extends javax.swing.JFrame {
                     relation.getDependencies()));
             keys = CandidateKeys.candidateKeys(relation,
                     closures);
-            List<Relation> bernstein = Bernstein.getBernstein(relation);
+            Map<String, Relation> bernstein = Bernstein.getBernstein(relation);
             dlmSintesis.clear();
-            for (int i = 0; i < bernstein.size(); i++) {
-                Table table = relationTableConverter.convert(bernstein.get(i));
-                tables.add(table);
+            for(Map.Entry<String,Relation> entry : bernstein.entrySet()){
+                Table table = relationTableConverter.convert(entry.getValue());
+                tables.put(entry.getKey(), table);
                 dlmSintesis.addElement(table);
             }
             JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Se calcularon las particiones de la relación correctamente", "Correcto", JOptionPane.INFORMATION_MESSAGE);
@@ -579,8 +570,8 @@ public class App extends javax.swing.JFrame {
 
     private void btnScriptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnScriptActionPerformed
         
-        Script script = new Script(this, tables);
-        script.setVisible(true);
+        //Script script = new Script(this, tables);
+        //script.setVisible(true);
         
     }//GEN-LAST:event_btnScriptActionPerformed
 
@@ -602,6 +593,20 @@ public class App extends javax.swing.JFrame {
         this.relation.getDependencies().add(funcDependencyNew);
         rePaintDepFunc(tslmDepFuncionales);
         JOptionPane.showMessageDialog(this, "Se modificó la dependencia funcional correctamente", "Correcto", JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+    public void addAttribute(Attribute attribute) {
+        this.relation.getAttributes().put(attribute.getKey(),attribute);
+        tslmAtributos.add(attribute);
+        JOptionPane.showMessageDialog(this, "Se agregó el atributo correctamente", "Correcto", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public void editAttribute(Attribute attributeOld, Attribute attributeNew) {
+        this.relation.editAttr(attributeOld.getKey(), attributeNew);
+        tslmAtributos.remove(attributeOld);
+        tslmAtributos.add(attributeNew);
+        rePaintDepFunc(tslmDepFuncionales);
+        JOptionPane.showMessageDialog(this, "Se modificó el atributo correctamente", "Correcto", JOptionPane.INFORMATION_MESSAGE);
     }
 
     public void cleanAll() {
@@ -667,7 +672,7 @@ public class App extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane8;
-    private javax.swing.JList<String> jlAtributos;
+    private javax.swing.JList<Attribute> jlAtributos;
     private javax.swing.JList<FuncDependency> jlDepFuncionales;
     private javax.swing.JList<Table> jlSintesis;
     private javax.swing.JPanel jpAtributos;

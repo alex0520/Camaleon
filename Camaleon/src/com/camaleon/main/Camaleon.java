@@ -10,6 +10,7 @@ import com.camaleon.logic.MinimalCover;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class Camaleon {
@@ -48,7 +49,7 @@ public class Camaleon {
 
             System.out.println("LLaves Candidatas: " + keys);
 
-            List<Relation> bernstein = Bernstein.getBernstein(relacion);
+            Map<String, Relation> bernstein = Bernstein.getBernstein(relacion);
             System.out.println("Bernstein:" + bernstein);
 /*
             Function<FuncDependency, DependenciaFuncional> convertFromFuncDepToDepFunc = new Function<FuncDependency, DependenciaFuncional>() {

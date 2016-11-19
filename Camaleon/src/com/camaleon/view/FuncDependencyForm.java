@@ -5,15 +5,18 @@
  */
 package com.camaleon.view;
 
+import com.camaleon.entities.Attribute;
 import com.camaleon.entities.FuncDependency;
 import com.camaleon.entities.TreeSetListModel;
 import com.google.common.collect.Sets;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.swing.JOptionPane;
 
@@ -24,16 +27,16 @@ import javax.swing.JOptionPane;
 public class FuncDependencyForm extends javax.swing.JFrame {
     
     App padre = null;
-    TreeSetListModel<String> tslmAttrNotImplicant = new TreeSetListModel<String>(String.CASE_INSENSITIVE_ORDER);
-    TreeSetListModel<String> tslmAttrImplicant = new TreeSetListModel<String>(String.CASE_INSENSITIVE_ORDER);
-    TreeSetListModel<String> tslmAttrNotImplied = new TreeSetListModel<String>(String.CASE_INSENSITIVE_ORDER);
-    TreeSetListModel<String> tslmAttrImplied = new TreeSetListModel<String>(String.CASE_INSENSITIVE_ORDER);
+    TreeSetListModel<Attribute> tslmAttrNotImplicant = new TreeSetListModel<>();
+    TreeSetListModel<Attribute> tslmAttrImplicant = new TreeSetListModel<>();
+    TreeSetListModel<Attribute> tslmAttrNotImplied = new TreeSetListModel<>();
+    TreeSetListModel<Attribute> tslmAttrImplied = new TreeSetListModel<>();
     FuncDependency funcDep = null;
 
     /**
      * Creates new form FuncDependencyForm
      */
-    public FuncDependencyForm(javax.swing.JFrame parent, FuncDependency funcDep, Set<String> attributes) {
+    public FuncDependencyForm(javax.swing.JFrame parent, FuncDependency funcDep, Map<String,Attribute> attributes) {
         
         this.funcDep = funcDep;
         padre = (App) parent;
@@ -52,23 +55,23 @@ public class FuncDependencyForm extends javax.swing.JFrame {
         Set<String> implicant = funcDep.getImplicantKeys();
         Set<String> implied = funcDep.getImpliedKeys();
         
-        HashSet<String> notImplicant = new HashSet<String>(Sets.difference(attributes, implicant));
-        HashSet<String> notImplied = new HashSet<String>(Sets.difference(attributes, implied));
+        HashSet<String> notImplicant = new HashSet<String>(Sets.difference(attributes.keySet(), implicant));
+        HashSet<String> notImplied = new HashSet<String>(Sets.difference(attributes.keySet(), implied));
         
         for (Iterator<String> iterator = notImplicant.iterator(); iterator.hasNext();) {
-            tslmAttrNotImplicant.add(iterator.next());
+            tslmAttrNotImplicant.add(attributes.get(iterator.next()));
         }
         
         for (Iterator<String> iterator = implicant.iterator(); iterator.hasNext();) {
-            tslmAttrImplicant.add(iterator.next());
+            tslmAttrImplicant.add(attributes.get(iterator.next()));
         }
         
         for (Iterator<String> iterator = notImplied.iterator(); iterator.hasNext();) {
-            tslmAttrNotImplied.add(iterator.next());
+            tslmAttrNotImplied.add(attributes.get(iterator.next()));
         }
         
         for (Iterator<String> iterator = implied.iterator(); iterator.hasNext();) {
-            tslmAttrImplied.add(iterator.next());
+            tslmAttrImplied.add(attributes.get(iterator.next()));
         }
         
     }
@@ -184,46 +187,40 @@ public class FuncDependencyForm extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(282, 282, 282)
-                .addComponent(lblImplicante)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(272, 272, 272)
-                        .addComponent(lblImplicado)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(btnAceptar)
-                        .addGap(36, 36, 36)
-                        .addComponent(btnCancel)
-                        .addGap(33, 33, 33))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(jScrollPane4)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnLeftImplicant, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(btnRightImplied)
-                                .addComponent(btnLeftImplied))
-                            .addComponent(btnRightImplicant, javax.swing.GroupLayout.Alignment.TRAILING))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(25, 25, 25))))
+                    .addComponent(jScrollPane4)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(btnRightImplied)
+                    .addComponent(btnLeftImplied)
+                    .addComponent(btnLeftImplicant)
+                    .addComponent(btnRightImplicant))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(25, 25, 25))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnAceptar)
+                .addGap(36, 36, 36)
+                .addComponent(btnCancel)
+                .addGap(33, 33, 33))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(282, 282, 282)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblImplicante)
+                    .addComponent(lblImplicado))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(lblImplicante)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -294,9 +291,9 @@ public class FuncDependencyForm extends javax.swing.JFrame {
 
     private void btnRightImplicantActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRightImplicantActionPerformed
         if (jlAttrImplicant.getSelectedIndices().length > 0) {
-            List<String> selectedValuesList = jlAttrImplicant.getSelectedValuesList();
+            List<Attribute> selectedValuesList = jlAttrImplicant.getSelectedValuesList();
             for (int i = 0; i < selectedValuesList.size(); i++) {
-                String attr = selectedValuesList.get(i);
+                Attribute attr = selectedValuesList.get(i);
                 tslmAttrNotImplicant.remove(attr);
                 tslmAttrImplicant.add(attr);
             }
@@ -305,9 +302,9 @@ public class FuncDependencyForm extends javax.swing.JFrame {
 
     private void btnLeftImplicantActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLeftImplicantActionPerformed
         if (jlAttrImplicantSel.getSelectedIndices().length > 0) {
-            List<String> selectedValuesList = jlAttrImplicantSel.getSelectedValuesList();
+            List<Attribute> selectedValuesList = jlAttrImplicantSel.getSelectedValuesList();
             for (int i = 0; i < selectedValuesList.size(); i++) {
-                String attr = selectedValuesList.get(i);
+                Attribute attr = selectedValuesList.get(i);
                 tslmAttrImplicant.remove(attr);
                 tslmAttrNotImplicant.add(attr);
             }
@@ -316,9 +313,9 @@ public class FuncDependencyForm extends javax.swing.JFrame {
 
     private void btnRightImpliedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRightImpliedActionPerformed
         if (jlAttrImplied.getSelectedIndices().length > 0) {
-            List<String> selectedValuesList = jlAttrImplied.getSelectedValuesList();
+            List<Attribute> selectedValuesList = jlAttrImplied.getSelectedValuesList();
             for (int i = 0; i < selectedValuesList.size(); i++) {
-                String attr = selectedValuesList.get(i);
+                Attribute attr = selectedValuesList.get(i);
                 tslmAttrNotImplied.remove(attr);
                 tslmAttrImplied.add(attr);
             }
@@ -327,9 +324,9 @@ public class FuncDependencyForm extends javax.swing.JFrame {
 
     private void btnLeftImpliedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLeftImpliedActionPerformed
         if (jlAttrImpliedSel.getSelectedIndices().length > 0) {
-            List<String> selectedValuesList = jlAttrImpliedSel.getSelectedValuesList();
+            List<Attribute> selectedValuesList = jlAttrImpliedSel.getSelectedValuesList();
             for (int i = 0; i < selectedValuesList.size(); i++) {
-                String attr = selectedValuesList.get(i);
+                Attribute attr = selectedValuesList.get(i);
                 tslmAttrImplied.remove(attr);
                 tslmAttrNotImplied.add(attr);
             }
@@ -339,8 +336,13 @@ public class FuncDependencyForm extends javax.swing.JFrame {
     private void btnAceptarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAceptarActionPerformed
         if (tslmAttrImplicant.getSize() > 0 && tslmAttrImplied.getSize() > 0) {
             FuncDependency funcDependency = new FuncDependency();
-            /*funcDependency.setImplicant(tslmAttrImplicant.getAllElements());
-            funcDependency.setImplied(tslmAttrImplied.getAllElements());*/
+            Map<String, Attribute> implicant = new HashMap<>();
+            tslmAttrImplicant.getAllElements().stream().forEach(attribute -> implicant.put(attribute.getKey(), attribute));
+            funcDependency.setImplicant(implicant);
+            Map<String, Attribute> implied = new HashMap<>();
+            tslmAttrImplied.getAllElements().stream().forEach(attribute -> implied.put(attribute.getKey(), attribute));
+            funcDependency.setImplicant(implicant);
+            funcDependency.setImplied(implied);
             this.dispose();
             if (funcDep.getImplicant().isEmpty()) {
                 padre.addFuncDependency(funcDependency);
@@ -399,10 +401,10 @@ public class FuncDependencyForm extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
-    private javax.swing.JList<String> jlAttrImplicant;
-    private javax.swing.JList<String> jlAttrImplicantSel;
-    private javax.swing.JList<String> jlAttrImplied;
-    private javax.swing.JList<String> jlAttrImpliedSel;
+    private javax.swing.JList<Attribute> jlAttrImplicant;
+    private javax.swing.JList<Attribute> jlAttrImplicantSel;
+    private javax.swing.JList<Attribute> jlAttrImplied;
+    private javax.swing.JList<Attribute> jlAttrImpliedSel;
     private javax.swing.JLabel lblImplicado;
     private javax.swing.JLabel lblImplicante;
     // End of variables declaration//GEN-END:variables

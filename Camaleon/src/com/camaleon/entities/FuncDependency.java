@@ -51,8 +51,8 @@ public class FuncDependency implements Comparable<FuncDependency> {
 
     @Override
     public String toString() {
-        return "[" + implicant + " -> "
-                + implied + "]";
+        return "[" + implicant.keySet() + " -> "
+                + implied.keySet() + "]";
     }
 
     /**

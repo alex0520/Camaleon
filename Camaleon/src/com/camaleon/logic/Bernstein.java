@@ -23,10 +23,10 @@ public class Bernstein {
      * @param dependencies Lista de dependencias funcionales
      * @return {@link TreeMap} Con las particiones de la relación
      */
-    public static TreeMap<String, HashSet<String>> getPartitions(Set<String> attributes, List<FuncDependency> dependencies) {
-        TreeMap<String, HashSet<String>> partitions = new TreeMap<>();
+    public static TreeMap<String, Set<String>> getPartitions(Set<String> attributes, List<FuncDependency> dependencies) {
+        TreeMap<String, Set<String>> partitions = new TreeMap<>();
         for (int i = 0; i < dependencies.size(); i++) {
-            String key = Joiner.on("").join(dependencies.get(i).getImplicantKeys());
+            String key = Joiner.on("|").join(dependencies.get(i).getImplicantKeys());
             if (partitions.containsKey(key)) {
                 partitions.get(key).addAll(dependencies.get(i).getImpliedKeys());
             } else {
@@ -50,7 +50,7 @@ public class Bernstein {
         Sets.SetView<String> keys = Sets.difference(Sets.union(implicantNew, impliedNew), attributes);
         if (keys.size() > 0) {
 
-            String key = Joiner.on("").join(keys);
+            String key = Joiner.on("|").join(keys);
             HashSet<String> values = new HashSet<>(keys);
             partitions.put(key, values);
         }
@@ -64,31 +64,31 @@ public class Bernstein {
      * @param partitions Conjunto de particiones
      * @return {@link List} Lista de particiones sin dependencias duplicadas
      */
-    public static List<HashSet<String>> remDupPartitions(TreeMap<String, HashSet<String>> partitions) {
-        List<HashSet<String>> cleanPartitions = new ArrayList<>();
+    public static TreeMap<String, Set<String>> remDupPartitions(TreeMap<String, Set<String>> partitions) {
+        TreeMap<String, Set<String>> cleanPartitions = new TreeMap<>();
         int i = 0;
         LinkedList<HashSet<String>> list = new LinkedList(partitions.values());
 
         Collections.sort(list, (HashSet<String> o1, HashSet<String> o2) -> o2.size() - o1.size());
 
         for (HashSet<String> partition : list) {
+            String key = Joiner.on(",").join(partition);
             if (i == 0) {
-                cleanPartitions.add(partition);
+                cleanPartitions.put(key, partition);
             }
             boolean duplicate = false;
-            for (int j = 0; j < cleanPartitions.size(); j++) {
-                HashSet<String> hashSet = cleanPartitions.get(j);
+            for(Map.Entry<String,Set<String>> entry : cleanPartitions.entrySet()) {
+                Set<String> hashSet = entry.getValue();
                 if (hashSet.containsAll(partition)) {
                     duplicate = true;
                     break;
                 }
             }
             if (!duplicate) {
-                cleanPartitions.add(partition);
+                cleanPartitions.put(key, partition);
             }
             i++;
         }
-        Collections.sort(cleanPartitions, Util.hashSetComparator);
         return cleanPartitions;
     }
 
@@ -98,21 +98,21 @@ public class Bernstein {
      * @param relation la relación de la que desea calcular las particiones
      * @return {@link List} Listado de particiones
      */
-    public static List<Relation> getBernstein(Relation relation) {
-        List<Relation> proyecciones = new ArrayList<>();
-        TreeMap<String, HashSet<String>> partitions = Bernstein.getPartitions(relation.getAttributeKeys(), relation.getDependencies());
-        List<HashSet<String>> cleanPartitions = Bernstein.remDupPartitions(partitions);
+    public static Map<String,Relation> getBernstein(Relation relation) {
+        Map<String, Relation> proyecciones = new HashMap<>();
+        TreeMap<String, Set<String>> partitions = Bernstein.getPartitions(relation.getAttributeKeys(), relation.getDependencies());
+        TreeMap<String, Set<String>> cleanPartitions = Bernstein.remDupPartitions(partitions);
 
         Projection projection = new Projection(relation.getDependencies(), relation.getAttributeKeys());
-        for (Iterator<HashSet<String>> iterator = cleanPartitions.iterator(); iterator.hasNext(); ) {
-            HashSet<String> partition = iterator.next();
+        for(Map.Entry<String,Set<String>> entry : cleanPartitions.entrySet()) {
+            Set<String> partition = entry.getValue();
             Relation relationIn = new Relation();
             Map<String, Attribute> attributeMap = new HashMap<>();
             partition.forEach(attribute -> attributeMap.put(attribute, relation.getAttributes().get(attribute)));
-            relation.setAttributes(attributeMap);
+            relationIn.setAttributes(attributeMap);
             List<FuncDependency> proyDependencies = new LinkedList<>(projection.getProjection(partition));
-            relation.setDependencies(proyDependencies);
-            proyecciones.add(relation);
+            relationIn.setDependencies(proyDependencies);
+            proyecciones.put(entry.getKey(),relationIn);
         }
         return proyecciones;
     }

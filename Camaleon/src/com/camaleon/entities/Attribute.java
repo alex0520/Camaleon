@@ -12,7 +12,7 @@ import java.util.Objects;
  *
  * @author Lizeth Valbuena, Alexander Lozano
  */
-public class Attribute {
+public class Attribute implements Comparable<Attribute>  {
     
     private String key;
     private String name;
@@ -90,22 +90,14 @@ public class Attribute {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Attribute{");
         sb.append(key);
         sb.append(" : ");
         sb.append(name);
-        if(type!=null){
-            sb.append(" ");
-            sb.append("[");
-            sb.append(type.toString());
-            if(type.getValue()){
-                sb.append("(");
-                sb.append(length);
-                sb.append(")");
-            }
-            sb.append("]");
-        }
-        sb.append("}");
         return sb.toString();
+    }
+
+    @Override
+    public int compareTo(Attribute o) {
+        return this.getKey().compareTo(o.getKey());
     }
 }

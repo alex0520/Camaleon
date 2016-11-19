@@ -62,21 +62,20 @@ public class Relation {
      * @param oldValue Valor Actual de un atributo
      * @param newValue Nuevo Valor del atributo
      */
-    /*
-    public void editAttr(String oldValue, String newValue) {
+    public void editAttr(String oldValue, Attribute newValue) {
         this.attributes.remove(oldValue);
-        this.attributes.add(newValue);
+        this.attributes.put(newValue.getKey(),newValue);
         for (int i = 0; i < this.dependencies.size(); i++) {
             FuncDependency funcDep = this.dependencies.get(i);
             boolean change = false;
-            if (funcDep.getImplicant().contains(oldValue)) {
+            if (funcDep.getImplicantKeys().contains(oldValue)) {
                 funcDep.getImplicant().remove(oldValue);
-                funcDep.getImplicant().add(newValue);
+                funcDep.getImplicant().put(newValue.getKey(), newValue);
                 change = true;
             }
-            if (funcDep.getImplied().contains(oldValue)) {
+            if (funcDep.getImpliedKeys().contains(oldValue)) {
                 funcDep.getImplied().remove(oldValue);
-                funcDep.getImplied().add(newValue);
+                funcDep.getImplied().put(newValue.getKey(), newValue);
                 change = true;
             }
             if (change) {
@@ -84,21 +83,20 @@ public class Relation {
                 this.dependencies.add(i, funcDep);
             }
         }
-    }*/
+    }
 
     /**
      *  Elimina un atributo de la relación
      *
      * @param oldValue Valor del atributo anterior
      */
-    /*
     public void delAttr(String oldValue) {
         this.attributes.remove(oldValue);
         for (int i = 0; i < this.dependencies.size(); i++) {
             FuncDependency funcDep = this.dependencies.get(i);
             boolean change = false;
             boolean remove = false;
-            if (funcDep.getImplicant().contains(oldValue)) {
+            if (funcDep.getImplicantKeys().contains(oldValue)) {
                 if (funcDep.getImplicant().size() == 1) {
                     remove = true;
                 } else {
@@ -106,7 +104,7 @@ public class Relation {
                     change = true;
                 }
             }
-            if (!remove && funcDep.getImplied().contains(oldValue)) {
+            if (!remove && funcDep.getImplied().containsKey(oldValue)) {
                 if (funcDep.getImplied().size() == 1) {
                     remove = true;
                 } else {
@@ -125,6 +123,6 @@ public class Relation {
                 this.dependencies.add(i, funcDep);
             }
         }
-    }*/
+    }
 
 }
