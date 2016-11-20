@@ -8,12 +8,18 @@ package com.camaleon.view;
 import com.camaleon.entities.Attribute;
 import com.camaleon.entities.AttributeDataType;
 import com.camaleon.entities.Table;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.sql.JDBCType;
+import java.io.File;
+import java.io.FileWriter;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
@@ -22,7 +28,9 @@ import javax.swing.DefaultComboBoxModel;
 public class Script extends javax.swing.JFrame {
 
     App padre = null;
-    List<Table> tables = null;
+    Map<String,Table> tables = null;
+    List<String> keyList = null;
+    final String namePattern = "[A-Za-z0-9_]+";
 
     DefaultComboBoxModel<Attribute> dCBMAtributos = new DefaultComboBoxModel<>();
     DefaultComboBoxModel<String> dCBMTables = new DefaultComboBoxModel<>();
@@ -30,7 +38,7 @@ public class Script extends javax.swing.JFrame {
     /**
      * Creates new form Script
      */
-    public Script(javax.swing.JFrame parent, List<Table> tables) {
+    public Script(javax.swing.JFrame parent, Map<String,Table> tables) {
         this.tables = tables;
         this.padre = (App) parent;
         initComponents();
@@ -39,11 +47,8 @@ public class Script extends javax.swing.JFrame {
         this.setLocation(dim.width / 2 - this.getSize().width / 2, dim.height / 2 - this.getSize().height / 2);
         
         selTable.setModel(dCBMTables);
-        selTipo.setModel(new DefaultComboBoxModel(JDBCType.values()));
-        selAtributo.setModel(dCBMAtributos);
         if (!tables.isEmpty()) {
             populateTables();
-            populateAttributes(0);
         }
     }
 
@@ -60,13 +65,6 @@ public class Script extends javax.swing.JFrame {
         selTable = new javax.swing.JComboBox<>();
         lblTableSelect = new javax.swing.JLabel();
         lblStep1 = new javax.swing.JLabel();
-        selAtributo = new javax.swing.JComboBox<>();
-        lblAtributo = new javax.swing.JLabel();
-        lblStep2 = new javax.swing.JLabel();
-        lblStep3 = new javax.swing.JLabel();
-        selTipo = new javax.swing.JComboBox<>();
-        lblAtributo1 = new javax.swing.JLabel();
-        btnGuardarTipo = new javax.swing.JButton();
         lblNombreTabla = new javax.swing.JLabel();
         txtTableName = new javax.swing.JTextField();
         btnGuardarNombreTabla = new javax.swing.JButton();
@@ -85,28 +83,7 @@ public class Script extends javax.swing.JFrame {
 
         lblTableSelect.setText("Tabla:");
 
-        lblStep1.setText("1. Seleccione una tabla");
-
-        selAtributo.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                selAtributoItemStateChanged(evt);
-            }
-        });
-
-        lblAtributo.setText("Atributo:");
-
-        lblStep2.setText("2. Seleccione un atributo");
-
-        lblStep3.setText("3. Seleccione el tipo de dato");
-
-        lblAtributo1.setText("Tipo:");
-
-        btnGuardarTipo.setText("Guardar Tipo");
-        btnGuardarTipo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGuardarTipoActionPerformed(evt);
-            }
-        });
+        lblStep1.setText("Seleccione una tabla y cambie su nombre, para generar el script");
 
         lblNombreTabla.setText("Nombre Tabla:");
 
@@ -149,31 +126,17 @@ public class Script extends javax.swing.JFrame {
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(selTable, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(txtTableName)))
-                            .addComponent(lblStep2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(lblAtributo)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
-                                .addComponent(selAtributo, javax.swing.GroupLayout.PREFERRED_SIZE, 398, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(lblStep3)
-                                    .addComponent(lblStep1))
-                                .addGap(0, 0, Short.MAX_VALUE))
+                                .addComponent(lblStep1)
+                                .addGap(0, 166, Short.MAX_VALUE))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                                 .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(btnGuardarNombreTabla))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(lblAtributo1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(selTipo, javax.swing.GroupLayout.PREFERRED_SIZE, 398, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addComponent(btnGuardarNombreTabla))))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnGuardarTipo, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                .addComponent(btnGenerarScript)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnCancelar)))))
+                        .addComponent(btnGenerarScript)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnCancelar)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -191,21 +154,7 @@ public class Script extends javax.swing.JFrame {
                     .addComponent(txtTableName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnGuardarNombreTabla)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(lblStep2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblAtributo)
-                    .addComponent(selAtributo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(lblStep3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblAtributo1)
-                    .addComponent(selTipo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnGuardarTipo)
-                .addGap(33, 33, 33)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnCancelar)
                     .addComponent(btnGenerarScript))
@@ -226,53 +175,27 @@ public class Script extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnGuardarTipoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarTipoActionPerformed
-        int tableSelected = selTable.getSelectedIndex();
-        Table table = tables.get(tableSelected);
-        List<Attribute> attributes = table.getAttributes();
-        int attrSelected = selAtributo.getSelectedIndex();
-        Attribute attribute = attributes.get(attrSelected);
-        //JDBCType type = (JDBCType) selTipo.getSelectedItem();
-        
-        tables.stream().forEach(t -> t.getAttributes().stream().filter(a -> a.getName().equals(attribute.getName())).forEach(a -> a.setType(AttributeDataType.VARCHAR)));
-        
-        rePaintSelAttribute(dCBMAtributos);
-        
-        long noTypeAttributeTables = tables.stream().filter(t -> t.getAttributes().stream().filter(a -> a.getType()==null).count()>0).count();
-        if(noTypeAttributeTables == 0){
-            btnGenerarScript.setEnabled(true);
-        }
-        
-    }//GEN-LAST:event_btnGuardarTipoActionPerformed
-
-    private void selAtributoItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_selAtributoItemStateChanged
-        Table table = tables.get(selTable.getSelectedIndex());
-        List<Attribute> attributes = table.getAttributes();
-        int attrSelected = selAtributo.getSelectedIndex();
-        if (attrSelected > -1) {
-            Attribute attribute = attributes.get(attrSelected);
-            if (attribute.getType() != null) {
-                selTipo.setSelectedItem(attribute.getType());
-            }
-        }
-    }//GEN-LAST:event_selAtributoItemStateChanged
-
     private void selTableItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_selTableItemStateChanged
         int selectedTableIndex = selTable.getSelectedIndex();
         if (selectedTableIndex > -1) {
-            populateAttributes(selectedTableIndex);
-            Table table = tables.get(selectedTableIndex);
+            Table table = tables.get(keyList.get(selectedTableIndex));
             txtTableName.setText(table.getTableName());
         }
     }//GEN-LAST:event_selTableItemStateChanged
 
     private void btnGuardarNombreTablaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarNombreTablaActionPerformed
-        int selectedTableIndex = selTable.getSelectedIndex();
-        if (selectedTableIndex > -1) {
-            Table table = tables.get(selectedTableIndex);
-            table.setTableName(txtTableName.getText());
-            populateTables();
-            selTable.setSelectedIndex(selectedTableIndex);
+        String tableName = txtTableName.getText();
+        if(tableName.matches(namePattern)){
+            int selectedTableIndex = selTable.getSelectedIndex();
+            if (selectedTableIndex > -1) {
+                Table table = tables.get(keyList.get(selectedTableIndex));
+                table.setTableName(txtTableName.getText());
+                populateTables();
+                selTable.setSelectedIndex(selectedTableIndex);
+                JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Se cambió el nombre de la tabla correctamente", "Correcto", JOptionPane.INFORMATION_MESSAGE);
+            }
+        }else{
+            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "El nombre de la tabla no es válido, el nombre solo puede contener letras, números y _", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnGuardarNombreTablaActionPerformed
 
@@ -281,10 +204,27 @@ public class Script extends javax.swing.JFrame {
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     private void btnGenerarScriptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerarScriptActionPerformed
+        String script =  getScript();
+        JFileChooser chooser = new JFileChooser();
+        chooser.addChoosableFileFilter(new FileNameExtensionFilter("Archivos SQL (.sql)", "sql"));
+        chooser.setFileFilter(chooser.getChoosableFileFilters()[0]);
+        chooser.setAcceptAllFileFilterUsed(false);
+        chooser.setSelectedFile(new File("Script"));
+        int retrival = chooser.showSaveDialog(null);
+        if (retrival == JFileChooser.APPROVE_OPTION) {
+            try(FileWriter fw = new FileWriter(chooser.getSelectedFile().getCanonicalPath() + "." + ((FileNameExtensionFilter) chooser.getFileFilter()).getExtensions()[0])) {
+                fw.write(script);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_btnGenerarScriptActionPerformed
+
+    private String getScript() {
         StringBuilder sb =  new StringBuilder();
         StringBuilder sbAttributes;
-        
-        for(Table table : tables){
+        for(Map.Entry<String,Table> entry : tables.entrySet()){
+            Table table = entry.getValue();
             sb.append("CREATE TABLE ");
             sb.append(table.getTableName());
             sb.append(" (");
@@ -293,45 +233,49 @@ public class Script extends javax.swing.JFrame {
                 if(sbAttributes.length()>0){
                     sbAttributes.append(",");
                 }
-                sbAttributes.append("\n");
+                sbAttributes.append("\n\r");
                 sbAttributes.append("\t");
                 sbAttributes.append(attribute.getName());
                 sbAttributes.append(" ");
-                sbAttributes.append(attribute.getType());
+                AttributeDataType type = attribute.getType();
+                sbAttributes.append(type.getName());
+                if(type.requiresLength()){
+                    sbAttributes.append("(");
+                    sbAttributes.append(attribute.getLength());
+                    if(type.requiresScale()){
+                        sbAttributes.append(",");
+                        sbAttributes.append(attribute.getScale());
+                    }
+                    sbAttributes.append(")");
+                }
             }
             sb.append(sbAttributes);
-            sb.append("\n);");
-            sb.append("\n");
+            sb.append(",\n\r\t");
+            sb.append("CONSTRAINT");
+            sb.append(" ");
+            sb.append("pk_").append(table.getTableName());
+            sb.append(" ");
+            sb.append("PRIMARY KEY");
+            sb.append(" ");
+            sb.append("(");
+            sb.append(entry.getKey());
+            sb.append(")");
+            sb.append("\n\r);");
+            sb.append("\n\r");
         }
-        System.out.println(sb.toString());
-    }//GEN-LAST:event_btnGenerarScriptActionPerformed
-
-    private void populateAttributes(int tableIndex) {
-        dCBMAtributos.removeAllElements();
-        Table table = tables.get(tableIndex);
-
-        table.getAttributes().forEach(attribute -> dCBMAtributos.addElement(attribute));
+        return sb.toString();
     }
-    
+   
     private void populateTables() {
         dCBMTables.removeAllElements();
-        List<String> tableNames = this.tables.stream().map(t -> t.getTableName()).collect(Collectors.toList());
-        tableNames.stream().forEach(t -> dCBMTables.addElement(t));
-    }
-
-    private void rePaintSelAttribute(DefaultComboBoxModel model) {
-        int tableSelected = selTable.getSelectedIndex();
-        if (tableSelected > -1) {
-            int attrSelected = selAtributo.getSelectedIndex();
-            model.removeAllElements();
-            Table table = tables.get(tableSelected);
-            for (Attribute attribute : table.getAttributes()) {
-                model.addElement(attribute);
-            }
-            selAtributo.setSelectedIndex(attrSelected);
+        keyList = new ArrayList(tables.keySet());
+        this.tables.entrySet().stream().map(entry -> entry.getValue().getTableName()).forEach(t -> dCBMTables.addElement(t));
+        long tableInvalidNames = this.tables.values().stream().filter(table -> !table.getTableName().matches(namePattern)).count();
+        if(tableInvalidNames==0){
+            btnGenerarScript.setEnabled(true);
         }
     }
-
+    
     /**
      * @param args the command line arguments
      */
@@ -371,18 +315,11 @@ public class Script extends javax.swing.JFrame {
     private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnGenerarScript;
     private javax.swing.JButton btnGuardarNombreTabla;
-    private javax.swing.JButton btnGuardarTipo;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JLabel lblAtributo;
-    private javax.swing.JLabel lblAtributo1;
     private javax.swing.JLabel lblNombreTabla;
     private javax.swing.JLabel lblStep1;
-    private javax.swing.JLabel lblStep2;
-    private javax.swing.JLabel lblStep3;
     private javax.swing.JLabel lblTableSelect;
-    private javax.swing.JComboBox<Attribute> selAtributo;
     private javax.swing.JComboBox<String> selTable;
-    private javax.swing.JComboBox<JDBCType> selTipo;
     private javax.swing.JTextField txtTableName;
     // End of variables declaration//GEN-END:variables
 }

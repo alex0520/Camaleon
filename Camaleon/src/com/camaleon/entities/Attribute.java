@@ -18,6 +18,7 @@ public class Attribute implements Comparable<Attribute>  {
     private String name;
     private AttributeDataType type;
     private Long length;
+    private Long scale;
     
     public Attribute() {
     }
@@ -63,6 +64,14 @@ public class Attribute implements Comparable<Attribute>  {
 
     public void setLength(Long length) {
         this.length = length;
+    }
+
+    public Long getScale() {
+        return scale;
+    }
+
+    public void setScale(Long scale) {
+        this.scale = scale;
     }
     
     @Override

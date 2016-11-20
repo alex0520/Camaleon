@@ -3,7 +3,6 @@ package com.camaleon.logic;
 import com.camaleon.entities.Attribute;
 import com.camaleon.entities.AttributeDataType;
 import java.io.FileReader;
-import java.util.HashSet;
 import java.util.Iterator;
 
 import org.json.simple.JSONArray;
@@ -17,7 +16,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 
 /**
@@ -51,8 +49,19 @@ public class LoadFile {
                     attribute.setKey(jsonAttribute.get("key").toString());
                     attribute.setName(jsonAttribute.get("name").toString());
                     attribute.setType(AttributeDataType.valueOf(jsonAttribute.get("type").toString()));
-                    if (attribute.getType().getValue()) {
-                        attribute.setLength((long) jsonAttribute.get("length"));
+                    if (attribute.getType().requiresLength()) {
+                        Long length = (Long) jsonAttribute.get("length");
+                        if(length==null){
+                            throw new Exception("El tipo de dato "+attribute.getType()+" del atributo "+attribute.getName()+" requiere que se especifique longitud");
+                        }
+                        attribute.setLength(length);
+                    }
+                    if (attribute.getType().requiresScale()) {
+                        Long scale = (Long) jsonAttribute.get("scale");
+                        if(scale==null){
+                            throw new Exception("El tipo de dato "+attribute.getType()+" del atributo "+attribute.getName()+" requiere que se especifique escala");
+                        }
+                        attribute.setScale(scale);
                     }
                     attributes.put(attribute.getKey(), attribute);
                 }

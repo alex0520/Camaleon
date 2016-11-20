@@ -72,6 +72,11 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="btnCancelar" min="-2" max="-2" attributes="0"/>
                       </Group>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="lblScale" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="35" max="32767" attributes="0"/>
+                          <Component id="txtScale" min="-2" pref="388" max="-2" attributes="0"/>
+                      </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -100,7 +105,12 @@
                       <Component id="lblLength" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="txtLength" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace pref="25" max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="lblScale" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="txtScale" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="32767" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="btnCancelar" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="btnGuardarAtributo" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -117,11 +127,6 @@
               <StringArray count="0"/>
             </Property>
           </Properties>
-          <AccessibilityProperties>
-            <Property name="AccessibleContext.accessibleParent" type="javax.accessibility.Accessible" editor="org.netbeans.modules.form.ComponentChooserEditor">
-              <ComponentRef name="lblType"/>
-            </Property>
-          </AccessibilityProperties>
           <Events>
             <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="selTipoItemStateChanged"/>
           </Events>
@@ -170,6 +175,13 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txtLength">
+        </Component>
+        <Component class="javax.swing.JLabel" name="lblScale">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Escala:"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JTextField" name="txtScale">
         </Component>
       </SubComponents>
     </Container>

@@ -16,22 +16,16 @@ import com.camaleon.logic.Bernstein;
 import com.camaleon.logic.CandidateKeys;
 import com.camaleon.logic.LoadFile;
 import com.camaleon.logic.MinimalCover;
-import com.camaleon.logic.segterformanormal.Atribute;
-import com.camaleon.logic.segterformanormal.DependenciaFuncional;
-import com.camaleon.logic.segterformanormal.NormalForm;
 import com.google.common.base.Joiner;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -39,7 +33,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
- * @author Alexander Lozano
+ * @author Lizeth Valbuena, Alexander Lozano
  */
 public class App extends javax.swing.JFrame {
 
@@ -63,6 +57,7 @@ public class App extends javax.swing.JFrame {
         jlDepFuncionales.setModel(tslmDepFuncionales);
         jlSintesis.setModel(dlmSintesis);
         jtpVista.setEnabledAt(1, false);
+        btnScript.setEnabled(false);
     }
 
     /**
@@ -81,8 +76,6 @@ public class App extends javax.swing.JFrame {
         btnAddAtr = new javax.swing.JButton();
         btnEditAtr = new javax.swing.JButton();
         btnDelAtr = new javax.swing.JButton();
-        btn2FormaNormal = new javax.swing.JButton();
-        btn3aFormaNormal = new javax.swing.JButton();
         jpDepFuncionales = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jlDepFuncionales = new javax.swing.JList<>();
@@ -133,22 +126,6 @@ public class App extends javax.swing.JFrame {
             }
         });
 
-        btn2FormaNormal.setText("2a Forma Normal");
-        btn2FormaNormal.setEnabled(false);
-        btn2FormaNormal.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn2FormaNormalActionPerformed(evt);
-            }
-        });
-
-        btn3aFormaNormal.setText("3a Forma Normal");
-        btn3aFormaNormal.setEnabled(false);
-        btn3aFormaNormal.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn3aFormaNormalActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout jpAtributosLayout = new javax.swing.GroupLayout(jpAtributos);
         jpAtributos.setLayout(jpAtributosLayout);
         jpAtributosLayout.setHorizontalGroup(
@@ -163,10 +140,6 @@ public class App extends javax.swing.JFrame {
                         .addComponent(btnEditAtr)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnDelAtr)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btn2FormaNormal)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btn3aFormaNormal)
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -179,9 +152,7 @@ public class App extends javax.swing.JFrame {
                 .addGroup(jpAtributosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAddAtr)
                     .addComponent(btnEditAtr)
-                    .addComponent(btnDelAtr)
-                    .addComponent(btn2FormaNormal)
-                    .addComponent(btn3aFormaNormal))
+                    .addComponent(btnDelAtr))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -360,8 +331,6 @@ public class App extends javax.swing.JFrame {
                 }
 
                 JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), sb.toString(), "Correcto", JOptionPane.INFORMATION_MESSAGE);
-                btn2FormaNormal.setEnabled(false);
-                btn3aFormaNormal.setEnabled(false);
                 jtpVista.setEnabledAt(1, true);
             } else {
                 String errors = new StringBuilder("Ocurrieron los siguientes errores al cargar el archivo: ").append("\n\n").append(Joiner.on("\n").join(loadFileResult.getMessages())).toString();
@@ -459,92 +428,6 @@ public class App extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnDelDepFuncActionPerformed
 
-    private void btn2FormaNormalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn2FormaNormalActionPerformed
-        if (relation.getDependencies().size() > 0 && keys.size() > 0) {
-            Function<String, Atribute> convertFromStringToAtribute = new Function<String, Atribute>() {
-                @Override
-                public Atribute apply(String t) {
-                    return new Atribute(t);
-                }
-            };
-
-            Function<FuncDependency, DependenciaFuncional> convertFromFuncDepToDepFunc = new Function<FuncDependency, DependenciaFuncional>() {
-                public DependenciaFuncional apply(FuncDependency t) {
-                    List<Atribute> implicante = t.getImplicantKeys().stream().map(convertFromStringToAtribute).collect(Collectors.<Atribute>toList());
-                    List<Atribute> implicado = t.getImpliedKeys().stream().map(convertFromStringToAtribute).collect(Collectors.<Atribute>toList());
-                    DependenciaFuncional f = new DependenciaFuncional(implicante, implicado);
-                    return f;
-                }
-            };
-
-            List<DependenciaFuncional> dependencias = relation.getDependencies().stream().map(convertFromFuncDepToDepFunc).collect(Collectors.<DependenciaFuncional>toList());
-            List<Atribute> atributos = relation.getAttributeKeys().stream().map(convertFromStringToAtribute).collect(Collectors.<Atribute>toList());
-            List<List<Atribute>> keysList = new ArrayList<>();
-            for (Iterator<HashSet<String>> iterator = keys.iterator(); iterator.hasNext();) {
-                HashSet<String> key = iterator.next();
-                List<Atribute> collect = key.stream().map(convertFromStringToAtribute).collect(Collectors.<Atribute>toList());
-                keysList.add(collect);
-            }
-            NormalForm normalForm = new NormalForm();
-            boolean segundaFormaNormal = normalForm.validarSiEstaEnSegundaFormaNormal(dependencias, atributos, keysList);
-            String mensaje = "";
-            int tipo = 0;
-            if (segundaFormaNormal) {
-                mensaje = "La relaciòn actual, se encuentra en segunda forma normal";
-                tipo = JOptionPane.INFORMATION_MESSAGE;
-            } else {
-                mensaje = "La relaciòn actual, no se encuentra en segunda forma normal";
-                tipo = JOptionPane.ERROR_MESSAGE;
-            }
-            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), mensaje, "Resultados", tipo);
-        } else {
-            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Ud debe crear al menos una dependencia funcional y calcular llaves candidatas para utilizar esta opción", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }//GEN-LAST:event_btn2FormaNormalActionPerformed
-
-    private void btn3aFormaNormalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn3aFormaNormalActionPerformed
-        if (relation.getDependencies().size() > 0 && keys.size() > 0) {
-            Function<String, Atribute> convertFromStringToAtribute = new Function<String, Atribute>() {
-                @Override
-                public Atribute apply(String t) {
-                    return new Atribute(t);
-                }
-            };
-
-            Function<FuncDependency, DependenciaFuncional> convertFromFuncDepToDepFunc = new Function<FuncDependency, DependenciaFuncional>() {
-                public DependenciaFuncional apply(FuncDependency t) {
-                    List<Atribute> implicante = t.getImplicantKeys().stream().map(convertFromStringToAtribute).collect(Collectors.<Atribute>toList());
-                    List<Atribute> implicado = t.getImpliedKeys().stream().map(convertFromStringToAtribute).collect(Collectors.<Atribute>toList());
-                    DependenciaFuncional f = new DependenciaFuncional(implicante, implicado);
-                    return f;
-                }
-            };
-
-            List<DependenciaFuncional> dependencias = relation.getDependencies().stream().map(convertFromFuncDepToDepFunc).collect(Collectors.<DependenciaFuncional>toList());
-            List<Atribute> atributos = relation.getAttributeKeys().stream().map(convertFromStringToAtribute).collect(Collectors.<Atribute>toList());
-            List<List<Atribute>> keysList = new ArrayList<>();
-            for (Iterator<HashSet<String>> iterator = keys.iterator(); iterator.hasNext();) {
-                HashSet<String> key = iterator.next();
-                List<Atribute> collect = key.stream().map(convertFromStringToAtribute).collect(Collectors.<Atribute>toList());
-                keysList.add(collect);
-            }
-            NormalForm normalForm = new NormalForm();
-            boolean terceraFormaNormal = normalForm.validarSiEstaEnTerceraFormaNormal(dependencias, keysList);
-            String mensaje = "";
-            int tipo = 0;
-            if (terceraFormaNormal) {
-                mensaje = "La relaciòn actual, se encuentra en tercera forma normal";
-                tipo = JOptionPane.INFORMATION_MESSAGE;
-            } else {
-                mensaje = "La relaciòn actual, no se encuentra en tercera forma normal";
-                tipo = JOptionPane.ERROR_MESSAGE;
-            }
-            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), mensaje, "Resultados", tipo);
-        } else {
-            JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Ud debe crear al menos una dependencia funcional y calcular llaves candidatas para utilizar esta opción", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }//GEN-LAST:event_btn3aFormaNormalActionPerformed
-
     private void btnSintesisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSintesisActionPerformed
         if (relation.getDependencies().size() > 0) {
             relation.setDependencies(MinimalCover.rightDecomposition(relation
@@ -562,6 +445,7 @@ public class App extends javax.swing.JFrame {
                 tables.put(entry.getKey(), table);
                 dlmSintesis.addElement(table);
             }
+            btnScript.setEnabled(true);
             JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Se calcularon las particiones de la relación correctamente", "Correcto", JOptionPane.INFORMATION_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Ud debe crear al menos una dependencia funcional para utilizar esta opción", "Error", JOptionPane.ERROR_MESSAGE);
@@ -570,8 +454,8 @@ public class App extends javax.swing.JFrame {
 
     private void btnScriptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnScriptActionPerformed
         
-        //Script script = new Script(this, tables);
-        //script.setVisible(true);
+        Script script = new Script(this, tables);
+        script.setVisible(true);
         
     }//GEN-LAST:event_btnScriptActionPerformed
 
@@ -658,8 +542,6 @@ public class App extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btn2FormaNormal;
-    private javax.swing.JButton btn3aFormaNormal;
     private javax.swing.JButton btnAddAtr;
     private javax.swing.JButton btnAddDepFunc;
     private javax.swing.JButton btnCargar;

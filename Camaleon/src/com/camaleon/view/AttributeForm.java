@@ -16,7 +16,7 @@ import javax.swing.JOptionPane;
 
 /**
  *
- * @author ASUS
+ * @author Lizeth Valbuena, Alexander Lozano
  */
 public class AttributeForm extends javax.swing.JFrame {
     
@@ -39,6 +39,8 @@ public class AttributeForm extends javax.swing.JFrame {
         this.setLocation(dim.width / 2 - this.getSize().width / 2, dim.height / 2 - this.getSize().height / 2);
         txtLength.setVisible(false);
         lblLength.setVisible(false);
+        txtScale.setVisible(false);
+        lblScale.setVisible(false);
         selTipo.setModel(new DefaultComboBoxModel(AttributeDataType.values()));
         if(attribute!=null){
             txtKey.setText(this.attribute.getKey());
@@ -49,6 +51,9 @@ public class AttributeForm extends javax.swing.JFrame {
             if(this.attribute.getLength()!=null){
                 txtLength.setText(""+this.attribute.getLength());
             }
+        }else{
+            selTipo.setSelectedIndex(1);
+            selTipo.setSelectedIndex(0);
         }
     }
 
@@ -72,6 +77,8 @@ public class AttributeForm extends javax.swing.JFrame {
         txtName = new javax.swing.JTextField();
         lblLength = new javax.swing.JLabel();
         txtLength = new javax.swing.JTextField();
+        lblScale = new javax.swing.JLabel();
+        txtScale = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Atributo");
@@ -104,6 +111,8 @@ public class AttributeForm extends javax.swing.JFrame {
 
         lblLength.setText("Longitud:");
 
+        lblScale.setText("Escala:");
+
         javax.swing.GroupLayout lblKeyLayout = new javax.swing.GroupLayout(lblKey);
         lblKey.setLayout(lblKeyLayout);
         lblKeyLayout.setHorizontalGroup(
@@ -132,7 +141,11 @@ public class AttributeForm extends javax.swing.JFrame {
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(btnGuardarAtributo)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnCancelar)))
+                        .addComponent(btnCancelar))
+                    .addGroup(lblKeyLayout.createSequentialGroup()
+                        .addComponent(lblScale)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 35, Short.MAX_VALUE)
+                        .addComponent(txtScale, javax.swing.GroupLayout.PREFERRED_SIZE, 388, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         lblKeyLayout.setVerticalGroup(
@@ -154,14 +167,16 @@ public class AttributeForm extends javax.swing.JFrame {
                 .addGroup(lblKeyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblLength)
                     .addComponent(txtLength, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(lblKeyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblScale)
+                    .addComponent(txtScale, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(lblKeyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnCancelar)
                     .addComponent(btnGuardarAtributo))
                 .addContainerGap())
         );
-
-        selTipo.getAccessibleContext().setAccessibleParent(lblType);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -189,12 +204,21 @@ public class AttributeForm extends javax.swing.JFrame {
                 Attribute newAttribute = new Attribute(key, name);
                 AttributeDataType type =  (AttributeDataType) selTipo.getSelectedItem();
                 newAttribute.setType(type);
-                if(type.getValue()){
+                if(type.requiresLength()){
                     try {
                         long length = Long.parseLong(txtLength.getText());
                         newAttribute.setLength(length);
-                    } catch (Exception e) {
+                    } catch (NumberFormatException e) {
                         JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Debe ingresar un número válido en la longitud del campo", "Error", JOptionPane.ERROR_MESSAGE);
+                        error=true;
+                    }
+                }
+                if(type.requiresScale()){
+                    try {
+                        long scale = Long.parseLong(txtScale.getText());
+                        newAttribute.setScale(scale);
+                    } catch (NumberFormatException e) {
+                        JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Debe ingresar un número válido en la escala del campo", "Error", JOptionPane.ERROR_MESSAGE);
                         error=true;
                     }
                 }
@@ -220,9 +244,12 @@ public class AttributeForm extends javax.swing.JFrame {
     private void selTipoItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_selTipoItemStateChanged
         if(selTipo.getSelectedIndex()>-1){
             AttributeDataType tipo = (AttributeDataType) selTipo.getSelectedItem();
-            boolean requiresLength = tipo.getValue();
+            boolean requiresLength = tipo.requiresLength();
+            boolean requiresScale = tipo.requiresScale();
             lblLength.setVisible(requiresLength);
             txtLength.setVisible(requiresLength);
+            lblScale.setVisible(requiresScale);
+            txtScale.setVisible(requiresScale);
         }
     }//GEN-LAST:event_selTipoItemStateChanged
 
@@ -268,10 +295,12 @@ public class AttributeForm extends javax.swing.JFrame {
     private javax.swing.JPanel lblKey;
     private javax.swing.JLabel lblLength;
     private javax.swing.JLabel lblName;
+    private javax.swing.JLabel lblScale;
     private javax.swing.JLabel lblType;
     private javax.swing.JComboBox<AttributeDataType> selTipo;
     private javax.swing.JTextField txtKey;
     private javax.swing.JTextField txtLength;
     private javax.swing.JTextField txtName;
+    private javax.swing.JTextField txtScale;
     // End of variables declaration//GEN-END:variables
 }

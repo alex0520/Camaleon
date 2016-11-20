@@ -22,7 +22,7 @@ import javax.swing.JOptionPane;
 
 /**
  *
- * @author Alexander Lozano
+ * @author Lizeth Valbuena, Alexander Lozano
  */
 public class FuncDependencyForm extends javax.swing.JFrame {
     
