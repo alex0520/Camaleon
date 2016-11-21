@@ -219,8 +219,10 @@ public class Script extends javax.swing.JFrame {
         if (retrival == JFileChooser.APPROVE_OPTION) {
             try(FileWriter fw = new FileWriter(chooser.getSelectedFile().getCanonicalPath() + "." + ((FileNameExtensionFilter) chooser.getFileFilter()).getExtensions()[0])) {
                 fw.write(script);
+                JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Se generó el script correctamente", "Correcto", JOptionPane.INFORMATION_MESSAGE);
             }catch(Exception e){
                 e.printStackTrace();
+                JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent((Component) evt.getSource()), "Se produjo un error al guardar el Script, intente nuevamente", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }//GEN-LAST:event_btnGenerarScriptActionPerformed
