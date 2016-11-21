@@ -5,8 +5,11 @@
  */
 package com.camaleon.entities;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Representa una tabla para la generación del script de base de datos
@@ -16,14 +19,14 @@ import java.util.List;
 public class Table {
     
     private String tableName;
-    private List<Attribute> attributes;
+    private Map<String, Attribute> attributes;
 
     public Table(String tableName) {
         this.tableName = tableName;
-        this.attributes = new LinkedList<>();
+        this.attributes = new HashMap<>();
     }
 
-    public Table(String tableName, List<Attribute> attributes) {
+    public Table(String tableName, Map<String, Attribute> attributes) {
         this.tableName = tableName;
         this.attributes = attributes;
     }
@@ -36,16 +39,21 @@ public class Table {
         this.tableName = tableName;
     }
 
-    public List<Attribute> getAttributes() {
+    public Map<String, Attribute> getAttributes() {
         return attributes;
     }
 
-    public void setAttributes(List<Attribute> attributes) {
+    public void setAttributes(Map<String, Attribute> attributes) {
         this.attributes = attributes;
-    }
+    }    
     
-    public void addAttribute(Attribute attribute){
-        this.attributes.add(attribute);
+    /**
+     * Obtiene las llaves de los atributos de la tabla
+     *
+     * @return {@link Set} con las llaves de los atributos de la tabla
+     */
+    public Set<String> getAttributeKeys(){
+        return attributes.keySet();
     }
 
     @Override

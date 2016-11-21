@@ -14,8 +14,13 @@ import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -223,13 +228,26 @@ public class Script extends javax.swing.JFrame {
     private String getScript() {
         StringBuilder sb =  new StringBuilder();
         StringBuilder sbAttributes;
+        Map<String, Table> localTables;
         for(Map.Entry<String,Table> entry : tables.entrySet()){
             Table table = entry.getValue();
+            localTables = new HashMap<>(tables);
+            localTables.remove(entry.getKey());            
             sb.append("CREATE TABLE ");
             sb.append(table.getTableName());
             sb.append(" (");
             sbAttributes = new StringBuilder();
-            for(Attribute attribute : table.getAttributes()){
+            Set<String> primaryKeySet = localTables.keySet();
+            List<String> foreignKeys = new LinkedList<>();
+            for(String primarykey : primaryKeySet){
+                Set<String> primarykeyItems = new HashSet<>(Arrays.asList(primarykey.split(", ")));
+                    if(table.getAttributeKeys().containsAll(primarykeyItems)){
+                        foreignKeys.add(primarykey);
+                    }
+            }
+            
+            for(Map.Entry<String, Attribute> entryAttribute : table.getAttributes().entrySet()){
+                Attribute attribute = entryAttribute.getValue();
                 if(sbAttributes.length()>0){
                     sbAttributes.append(",");
                 }
@@ -258,8 +276,33 @@ public class Script extends javax.swing.JFrame {
             sb.append("PRIMARY KEY");
             sb.append(" ");
             sb.append("(");
-            sb.append(entry.getKey());
+            StringBuilder sbPrimaryKey = new StringBuilder();
+            String primaryKey = entry.getKey();
+            String[] primaryKeyItems = primaryKey.split(",");
+            for(String primaryKeyItem : primaryKeyItems){
+                if(sbPrimaryKey.length()>0){
+                    sbPrimaryKey.append(",");
+                }
+                sbPrimaryKey.append(table.getAttributes().get(primaryKeyItem).getName());
+            }
+            sb.append(sbPrimaryKey);
             sb.append(")");
+            StringBuilder sbForeignKeys = new StringBuilder();
+            if(foreignKeys.size()>0){
+                for(String foreignKey : foreignKeys){
+                    sbForeignKeys.append("\n\r\t,");
+                    sbForeignKeys.append("FOREIGN KEY (");
+                    String attributeName = table.getAttributes().get(foreignKey).getName();
+                    sbForeignKeys.append(attributeName);
+                    sbForeignKeys.append(") ");
+                    sbForeignKeys.append("REFERENCES ");
+                    sbForeignKeys.append(tables.get(foreignKey).getTableName());
+                    sbForeignKeys.append("(");
+                    sbForeignKeys.append(attributeName);
+                    sbForeignKeys.append(")");
+                }
+            }
+            sb.append(sbForeignKeys);
             sb.append("\n\r);");
             sb.append("\n\r");
         }

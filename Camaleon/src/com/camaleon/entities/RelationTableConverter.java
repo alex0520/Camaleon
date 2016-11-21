@@ -21,9 +21,9 @@ public class RelationTableConverter extends Converter<Relation, Table>{
 	 */
     @Override
     protected Table doForward(Relation relation) {
-        Table table = new Table(relation.getAttributes().toString());
+        Table table = new Table(relation.getAttributeKeys().toString());
         for(Map.Entry<String,Attribute> entry : relation.getAttributes().entrySet()){
-            table.addAttribute(entry.getValue());
+            table.getAttributes().put(entry.getKey(),entry.getValue());
         }
         return table;
     }
@@ -33,8 +33,10 @@ public class RelationTableConverter extends Converter<Relation, Table>{
 	 * @see com.google.common.base.Converter#doBackward
 	 */
     @Override
-    protected Relation doBackward(Table b) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    protected Relation doBackward(Table table) {
+        Relation relation = new Relation();
+        relation.getAttributes().putAll(table.getAttributes());
+        return relation;
     }
     
 }

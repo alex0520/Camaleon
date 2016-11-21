@@ -107,21 +107,19 @@ public class MinimalCover {
      * @return {@link List} Lista de dependencias funcionales, sin dependencias funcionales redundantes
      */
     public static List<FuncDependency> removeRedundantDependencies(List<FuncDependency> dependencies) {
-        List<FuncDependency> tempDependencies;
-        int i = 0;
-        do {
-            tempDependencies = new ArrayList<>(dependencies);
-            FuncDependency funcDependency = tempDependencies.get(i);
+        dependencies.sort((f1,f2) -> f2.getImplicantKeys().size()-f1.getImplicantKeys().size());
+        List<FuncDependency> localDependencies = new ArrayList<>(dependencies);
+        List<FuncDependency> tempDependencies;        
+        for(FuncDependency funcDependency : dependencies){
             Set<String> implicant = funcDependency.getImplicantKeys();
             Set<String> implied = funcDependency.getImpliedKeys();
-            tempDependencies.remove(i);
+            tempDependencies = new ArrayList<>(localDependencies);
+            tempDependencies.remove(funcDependency);
             Set<String> closure = Closure.closure(implicant, tempDependencies, null);
             if (closure.containsAll(implied)) {
-                dependencies.remove(i);
-            } else {
-                i++;
+                localDependencies.remove(funcDependency);
             }
-        } while (i < dependencies.size());
-        return dependencies;
+        }
+        return localDependencies;
     }
 }

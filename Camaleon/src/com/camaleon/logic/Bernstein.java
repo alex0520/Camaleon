@@ -7,6 +7,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import java.util.stream.Collectors;
 
@@ -26,7 +27,7 @@ public class Bernstein {
     public static TreeMap<String, Set<String>> getPartitions(Set<String> attributes, List<FuncDependency> dependencies) {
         TreeMap<String, Set<String>> partitions = new TreeMap<>();
         for (int i = 0; i < dependencies.size(); i++) {
-            String key = Joiner.on("|").join(dependencies.get(i).getImplicantKeys());
+            String key = Joiner.on(",").join(dependencies.get(i).getImplicantKeys());
             if (partitions.containsKey(key)) {
                 partitions.get(key).addAll(dependencies.get(i).getImpliedKeys());
             } else {
@@ -50,7 +51,7 @@ public class Bernstein {
         Sets.SetView<String> keys = Sets.difference(Sets.union(implicantNew, impliedNew), attributes);
         if (keys.size() > 0) {
 
-            String key = Joiner.on("|").join(keys);
+            String key = Joiner.on(",").join(keys);
             HashSet<String> values = new HashSet<>(keys);
             partitions.put(key, values);
         }
@@ -66,12 +67,12 @@ public class Bernstein {
      */
     public static TreeMap<String, Set<String>> remDupPartitions(TreeMap<String, Set<String>> partitions) {
         TreeMap<String, Set<String>> cleanPartitions = new TreeMap<>();
+        
+        LinkedHashMap<String, Set<String>> localPartitions = partitions.entrySet().stream().sorted(Entry.comparingByValue((Set o1, Set o2) -> o2.size()-o1.size())).collect(Collectors.toMap(Entry::getKey, Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+                
         int i = 0;
-        LinkedList<HashSet<String>> list = new LinkedList(partitions.values());
-
-        Collections.sort(list, (HashSet<String> o1, HashSet<String> o2) -> o2.size() - o1.size());
-
-        for (HashSet<String> partition : list) {
+        for (Map.Entry<String,Set<String>> partitionEntry : localPartitions.entrySet()) {
+            Set<String> partition = partitionEntry.getValue();
             String key = Joiner.on(",").join(partition);
             if (i == 0) {
                 cleanPartitions.put(key, partition);
@@ -85,7 +86,7 @@ public class Bernstein {
                 }
             }
             if (!duplicate) {
-                cleanPartitions.put(key, partition);
+                cleanPartitions.put(partitionEntry.getKey(), partition);
             }
             i++;
         }
@@ -114,6 +115,22 @@ public class Bernstein {
             relationIn.setDependencies(proyDependencies);
             proyecciones.put(entry.getKey(),relationIn);
         }
-        return proyecciones;
+        Map<String, Relation> newProyecciones = new HashMap<>();
+        for(Map.Entry<String,Relation> entryRelation: proyecciones.entrySet()){
+            String actualKey = entryRelation.getKey();
+            Relation localRelation = entryRelation.getValue();
+            List<HashSet<String>> candidateKeys = CandidateKeys.candidateKeys(localRelation, null);
+            String newKey = actualKey;
+            for(HashSet<String> keySet : candidateKeys){
+                Set<String> primarykeyItems = new HashSet<>(Arrays.asList(newKey.split(",")));
+                if(keySet.size()<primarykeyItems.size()){
+                    newKey = Joiner.on(",").join(keySet);
+                }
+            }
+            newProyecciones.put(newKey, localRelation);
+            
+        }
+        
+        return newProyecciones;
     }
 }
